@@ -1,62 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/fireTopLayout"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#000"
-    android:keepScreenOn="true">
-
-  <com.google.firebase.samples.apps.mlkit.CameraSourcePreview
-      android:id="@+id/firePreview"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:layout_alignParentStart="true"
-      android:layout_alignParentTop="true">
-
-      <com.google.firebase.samples.apps.mlkit.GraphicOverlay
-          android:id="@+id/fireFaceOverlay"
-          android:layout_width="match_parent"
-          android:layout_height="match_parent"
-          android:layout_alignParentStart="true"
-          android:layout_alignParentTop="true"
-          android:layout_alignParentBottom="true"/>
-  </com.google.firebase.samples.apps.mlkit.CameraSourcePreview>
+    android:keepScreenOn="true"
+    android:orientation="vertical">
 
     <pl.droidsonroids.gif.GifImageView
+        android:id="@+id/outside_gif"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_centerInParent="true"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:scaleType="fitXY"
         android:src="@drawable/giphy" />
-  <FrameLayout
-      android:id="@+id/control"
-      android:layout_width="match_parent"
-      android:layout_height="60dp"
-      android:layout_alignParentBottom="true"
-      android:layout_alignParentStart="true"
-      android:layout_toEndOf="@id/firePreview"
-      android:background="#ffff">
 
-      <Spinner
-          android:id="@+id/spinner"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:layout_gravity="center"
-          android:visibility="visible"/>
+    <com.google.firebase.samples.apps.mlkit.CameraSourcePreview
+        android:id="@+id/inside_fire_preview"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/outside_gif">
 
-      <ToggleButton
-          android:id="@+id/facingswitch"
-          android:layout_width="48dp"
-          android:layout_height="48dp"
-          android:layout_gravity="center_horizontal"
-          android:background="@layout/toggle_style"
-          android:textOff=""
-          android:textOn=""
-          android:checked="false"
-          />
+        <com.google.firebase.samples.apps.mlkit.GraphicOverlay
+            android:id="@+id/fireFaceOverlay"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentBottom="true" />
+    </com.google.firebase.samples.apps.mlkit.CameraSourcePreview>
 
-  </FrameLayout>
+    <LinearLayout
+        android:id="@+id/control"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:background="#ffff"
+        android:orientation="horizontal">
 
+        <ToggleButton
+            android:id="@+id/facingswitch"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@layout/toggle_style"
+            android:checked="false"
+            android:textOff=""
+            android:textOn="" />
+
+        <Spinner
+            android:id="@+id/spinner"
+            android:layout_width="50dp"
+            android:layout_height="60dp"
+            android:visibility="visible" />
+    </LinearLayout>
 </RelativeLayout>

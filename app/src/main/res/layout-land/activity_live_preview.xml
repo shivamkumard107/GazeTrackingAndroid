@@ -9,7 +9,7 @@
     android:keepScreenOn="true">
 
   <com.google.firebase.samples.apps.mlkit.CameraSourcePreview
-      android:id="@+id/firePreview"
+      android:id="@+id/inside_fire_preview"
       android:layout_width="match_parent"
       android:layout_height="match_parent">
 

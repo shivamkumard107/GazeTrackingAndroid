@@ -69,7 +69,7 @@ public final class LivePreviewActivity extends AppCompatActivity
 
     setContentView(R.layout.activity_live_preview);
 
-    preview = (CameraSourcePreview) findViewById(R.id.firePreview);
+    preview = (CameraSourcePreview) findViewById(R.id.inside_fire_preview);
     if (preview == null) {
       Log.d(TAG, "Preview is null");
     }
