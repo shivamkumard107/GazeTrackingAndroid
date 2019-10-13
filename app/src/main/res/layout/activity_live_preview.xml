@@ -25,14 +25,11 @@
           android:layout_alignParentBottom="true"/>
   </com.google.firebase.samples.apps.mlkit.CameraSourcePreview>
 
-  <TextView android:id="@+id/text"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:paddingLeft="80dp"
-      android:textColor="#FFF"
-      android:textSize="20sp"
-      android:textStyle="bold" />
-
+    <pl.droidsonroids.gif.GifImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerInParent="true"
+        android:src="@drawable/giphy" />
   <FrameLayout
       android:id="@+id/control"
       android:layout_width="match_parent"
