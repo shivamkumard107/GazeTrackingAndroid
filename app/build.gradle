@@ -31,5 +31,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-ml-vision:15.0.0'
     implementation 'com.google.firebase:firebase-ml-vision-image-label-model:15.0.0'
     implementation 'com.google.firebase:firebase-ml-model-interpreter:15.0.0'
+
+    implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.17'
 }
 apply plugin: 'com.google.gms.google-services'
