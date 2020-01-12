@@ -68,7 +68,7 @@ public class CameraSource {
 
   protected Activity activity;
 
-  private Camera camera;
+  public Camera camera;
 
   protected int facing = CAMERA_FACING_BACK;
 
@@ -347,6 +347,8 @@ public class CameraSource {
     }
     return -1;
   }
+
+
 
   /**
    * Selects the most suitable preview and picture size, given the desired width and height.

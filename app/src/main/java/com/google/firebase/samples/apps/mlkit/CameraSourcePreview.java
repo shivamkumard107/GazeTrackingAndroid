@@ -30,7 +30,7 @@ public class CameraSourcePreview extends ViewGroup {
   private static final String TAG = "MIDemoApp:Preview";
 
   private Context context;
-  private SurfaceView surfaceView;
+  public SurfaceView surfaceView;
   private boolean startRequested;
   private boolean surfaceAvailable;
   private CameraSource cameraSource;

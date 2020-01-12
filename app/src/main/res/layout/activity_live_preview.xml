@@ -40,6 +40,21 @@
         android:background="#ffff"
         android:orientation="horizontal">
 
+
+        <Button
+            android:id="@+id/recordBtn"
+            android:layout_margin="4dp"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:background="@android:color/holo_red_light"/>
+
+        <Button
+            android:id="@+id/captureBtn"
+            android:layout_margin="4dp"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:background="@android:color/holo_blue_bright"/>
+
         <ToggleButton
             android:id="@+id/facingswitch"
             android:layout_width="48dp"
