@@ -25,12 +25,9 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".LivePreviewActivity" android:exported="true">
-        </activity>
+        <activity android:name=".LivePreviewActivity" android:exported="true"
+            android:screenOrientation="portrait"/>
 
-        <activity android:name=".StillImageActivity"
-            android:exported="true">
-        </activity>
     </application>
 
 </manifest>

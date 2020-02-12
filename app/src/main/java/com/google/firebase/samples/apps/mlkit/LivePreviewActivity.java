@@ -33,24 +33,29 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.Spinner;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.google.android.gms.common.annotation.KeepName;
 import com.google.firebase.ml.common.FirebaseMLException;
-import com.google.firebase.samples.apps.mlkit.barcodescanning.BarcodeScanningProcessor;
-import com.google.firebase.samples.apps.mlkit.custommodel.CustomImageClassifierProcessor;
-import com.google.firebase.samples.apps.mlkit.facedetection.FaceDetectionProcessor;
-import com.google.firebase.samples.apps.mlkit.imagelabeling.ImageLabelingProcessor;
-import com.google.firebase.samples.apps.mlkit.textrecognition.TextRecognitionProcessor;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Parameter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 import static android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE;
 
@@ -59,23 +64,20 @@ import static android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE;
 @KeepName
 public final class LivePreviewActivity extends AppCompatActivity
     implements OnRequestPermissionsResultCallback,
-        OnItemSelectedListener,
         CompoundButton.OnCheckedChangeListener {
-  private static final String FACE_DETECTION = "Face Detection";
-  private static final String TEXT_DETECTION = "Text Detection";
-  private static final String BARCODE_DETECTION = "Barcode Detection";
-  private static final String IMAGE_LABEL_DETECTION = "Label Detection";
-  private static final String CLASSIFICATION = "Classification";
   private static final String TAG = "LivePreviewActivity";
   private static final int PERMISSION_REQUESTS = 1;
 
   private CameraSource cameraSource = null;
   private CameraSourcePreview preview;
   private GraphicOverlay graphicOverlay;
-  private String selectedModel = FACE_DETECTION;
 
   public static final int MEDIA_TYPE_IMAGE = 1;
   public static final int MEDIA_TYPE_VIDEO = 2;
+  public static final String BASE_URL = "base_url/";
+
+  String fileString = "";
+  Retrofit retrofit;
 
 
   @Override
@@ -94,20 +96,27 @@ public final class LivePreviewActivity extends AppCompatActivity
       Log.d(TAG, "graphicOverlay is null");
     }
 
+
+//    retrofit = new Retrofit.Builder()
+//            .baseUrl(BASE_URL)
+//            .addConverterFactory(GsonConverterFactory.create())
+//            .build();
+
     Spinner spinner = (Spinner) findViewById(R.id.spinner);
-    List<String> options = new ArrayList<>();
-    options.add(FACE_DETECTION);
-    options.add(TEXT_DETECTION);
-    options.add(BARCODE_DETECTION);
-    options.add(IMAGE_LABEL_DETECTION);
-    options.add(CLASSIFICATION);
+    spinner.setVisibility(View.GONE);
+//    List<String> options = new ArrayList<>();
+//    options.add(FACE_DETECTION);
+//    options.add(TEXT_DETECTION);
+//    options.add(BARCODE_DETECTION);
+//    options.add(IMAGE_LABEL_DETECTION);
+//    options.add(CLASSIFICATION);
     // Creating adapter for spinner
-    ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(this, R.layout.spinner_style, options);
+//    ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(this, R.layout.spinner_style, options);
     // Drop down layout style - list view with radio button
-    dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+//    dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
     // attaching data adapter to spinner
-    spinner.setAdapter(dataAdapter);
-    spinner.setOnItemSelectedListener(this);
+//    spinner.setAdapter(dataAdapter);
+//    spinner.setOnItemSelectedListener(this);
 
     ToggleButton facingSwitch = (ToggleButton) findViewById(R.id.facingswitch);
     facingSwitch.setOnCheckedChangeListener(this);
@@ -156,37 +165,17 @@ public final class LivePreviewActivity extends AppCompatActivity
     });
 
     if (allPermissionsGranted()) {
-      createCameraSource(selectedModel);
+      createCameraSource();
     } else {
       getRuntimePermissions();
     }
-  }
-
-  @Override
-  public synchronized void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
-    // An item was selected. You can retrieve the selected item using
-    // parent.getItemAtPosition(pos)
-    selectedModel = parent.getItemAtPosition(pos).toString();
-    Log.d(TAG, "Selected model: " + selectedModel);
-    preview.stop();
-    if (allPermissionsGranted()) {
-      createCameraSource(selectedModel);
-      startCameraSource();
-    } else {
-      getRuntimePermissions();
-    }
-  }
-
-  @Override
-  public void onNothingSelected(AdapterView<?> parent) {
-    // Do nothing.
   }
 
   @Override
   public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
     Log.d(TAG, "Set facing");
     if (cameraSource != null) {
-      if (isChecked) {
+      if (!isChecked) {
         cameraSource.setFacing(CameraSource.CAMERA_FACING_FRONT);
       } else {
         cameraSource.setFacing(CameraSource.CAMERA_FACING_BACK);
@@ -196,39 +185,10 @@ public final class LivePreviewActivity extends AppCompatActivity
     startCameraSource();
   }
 
-  private void createCameraSource(String model) {
+  private void createCameraSource() {
     // If there's no existing cameraSource, create one.
     if (cameraSource == null) {
       cameraSource = new CameraSource(this, graphicOverlay);
-    }
-
-    try {
-      switch (model) {
-        case CLASSIFICATION:
-          Log.i(TAG, "Using Custom Image Classifier Processor");
-          cameraSource.setMachineLearningFrameProcessor(new CustomImageClassifierProcessor(this));
-          break;
-        case TEXT_DETECTION:
-          Log.i(TAG, "Using Text Detector Processor");
-          cameraSource.setMachineLearningFrameProcessor(new TextRecognitionProcessor());
-          break;
-        case FACE_DETECTION:
-          Log.i(TAG, "Using Face Detector Processor");
-          cameraSource.setMachineLearningFrameProcessor(new FaceDetectionProcessor());
-          break;
-        case BARCODE_DETECTION:
-          Log.i(TAG, "Using Barcode Detector Processor");
-          cameraSource.setMachineLearningFrameProcessor(new BarcodeScanningProcessor());
-          break;
-        case IMAGE_LABEL_DETECTION:
-          Log.i(TAG, "Using Image Label Detector Processor");
-          cameraSource.setMachineLearningFrameProcessor(new ImageLabelingProcessor());
-          break;
-        default:
-          Log.e(TAG, "Unknown model: " + model);
-      }
-    } catch (FirebaseMLException e) {
-      Log.e(TAG, "can not create camera source: " + model);
     }
   }
 
@@ -322,7 +282,7 @@ public final class LivePreviewActivity extends AppCompatActivity
           int requestCode, String[] permissions, int[] grantResults) {
     Log.i(TAG, "Permission granted!");
     if (allPermissionsGranted()) {
-      createCameraSource(selectedModel);
+      createCameraSource();
     }
     super.onRequestPermissionsResult(requestCode, permissions, grantResults);
   }
@@ -408,6 +368,12 @@ public final class LivePreviewActivity extends AppCompatActivity
     mCamera = cameraSource.camera;
     mediaRecorder = new MediaRecorder();
 
+    Camera.Parameters params = mCamera.getParameters();
+    params.setRotation(270);
+    mCamera.setParameters(params);
+    mCamera.setDisplayOrientation(90);
+    mediaRecorder.setOrientationHint(90);
+
     // Step 1: Unlock and set camera to MediaRecorder
     mCamera.unlock();
     mediaRecorder.setCamera(mCamera);
@@ -415,12 +381,14 @@ public final class LivePreviewActivity extends AppCompatActivity
     // Step 2: Set sources
     mediaRecorder.setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
     mediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
+//    mediaRecorder.setOrientationHint(90);
 
     // Step 3: Set a CamcorderProfile (requires API Level 8 or higher)
     mediaRecorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_LOW));
 
     // Step 4: Set output file
-    mediaRecorder.setOutputFile(getOutputMediaFile(MEDIA_TYPE_VIDEO).toString());
+    fileString = getOutputMediaFile(MEDIA_TYPE_VIDEO).toString();
+    mediaRecorder.setOutputFile(fileString);
 
     // Step 5: Set the preview output
     mediaRecorder.setPreviewDisplay(preview.surfaceView.getHolder().getSurface());
@@ -445,8 +413,42 @@ public final class LivePreviewActivity extends AppCompatActivity
       mediaRecorder.reset();   // clear recorder configuration
       mediaRecorder.release(); // release the recorder object
       mediaRecorder = null;
-      mCamera.lock();           // lock camera for later use
+      mCamera.lock(); // lock camera for later use
+
+      if(!fileString.equals("")){
+//        upload_video();
+        Toast.makeText(getApplicationContext(), "Uploading Video to server ...", Toast.LENGTH_LONG).show();
+      }
     }
+  }
+
+  private void upload_video(){
+    File file = new File(fileString);
+    RequestBody requestFile =
+            RequestBody.create(MediaType.parse("multipart/form-data"), file);
+
+// MultipartBody.Part is used to send also the actual file name
+    MultipartBody.Part body =
+            MultipartBody.Part.createFormData("video", file.getName(), requestFile);
+    fileString = "";
+    API api = retrofit.create(API.class);
+    Call<Response> response = api.upload(body);
+
+    response.enqueue(new Callback<Response>() {
+      @Override
+      public void onResponse(Call<Response> call, retrofit2.Response<Response> response) {
+        if(response.isSuccessful()){
+          Response res = response.body();
+          Toast.makeText(getApplicationContext(), res.getMessage(), Toast.LENGTH_LONG).show();
+        }
+      }
+
+      @Override
+      public void onFailure(Call<Response> call, Throwable t) {
+
+      }
+    });
+
   }
 
 }

@@ -30,7 +30,7 @@
             android:contentDescription="allign eyes"
             android:scaleType="fitStart"
             app:srcCompat="@drawable/eyes"
-            android:paddingTop="50dp"/>
+            android:paddingTop="40dp"/>
 
         <com.google.firebase.samples.apps.mlkit.GraphicOverlay
             android:id="@+id/fireFaceOverlay"
@@ -73,12 +73,13 @@
             android:background="@layout/toggle_style"
             android:checked="false"
             android:textOff=""
-            android:textOn="" />
+            android:textOn=""
+            android:visibility="gone"/>
 
         <Spinner
             android:id="@+id/spinner"
             android:layout_width="50dp"
             android:layout_height="60dp"
-            android:visibility="visible" />
+            android:visibility="gone"/>
     </LinearLayout>
 </RelativeLayout>
