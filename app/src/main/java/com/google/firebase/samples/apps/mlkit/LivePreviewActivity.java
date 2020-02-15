@@ -18,6 +18,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
 import android.media.CamcorderProfile;
+import android.media.CameraProfile;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Environment;
@@ -52,6 +53,7 @@ import java.util.List;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
+import pl.droidsonroids.gif.GifImageView;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Retrofit;
@@ -71,14 +73,15 @@ public final class LivePreviewActivity extends AppCompatActivity
   private CameraSource cameraSource = null;
   private CameraSourcePreview preview;
   private GraphicOverlay graphicOverlay;
+  private GifImageView GIFimg;
 
   public static final int MEDIA_TYPE_IMAGE = 1;
   public static final int MEDIA_TYPE_VIDEO = 2;
-  public static final String BASE_URL = "base_url/";
+  public static final String BASE_URL = "https://shrouded-lake-86672.herokuapp.com/";
 
   String fileString = "";
   Retrofit retrofit;
-
+  API service;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -88,6 +91,7 @@ public final class LivePreviewActivity extends AppCompatActivity
     setContentView(R.layout.activity_live_preview);
 
     preview = (CameraSourcePreview) findViewById(R.id.inside_fire_preview);
+    GIFimg = findViewById(R.id.outside_gif);
     if (preview == null) {
       Log.d(TAG, "Preview is null");
     }
@@ -95,12 +99,6 @@ public final class LivePreviewActivity extends AppCompatActivity
     if (graphicOverlay == null) {
       Log.d(TAG, "graphicOverlay is null");
     }
-
-
-//    retrofit = new Retrofit.Builder()
-//            .baseUrl(BASE_URL)
-//            .addConverterFactory(GsonConverterFactory.create())
-//            .build();
 
     Spinner spinner = (Spinner) findViewById(R.id.spinner);
     spinner.setVisibility(View.GONE);
@@ -124,6 +122,13 @@ public final class LivePreviewActivity extends AppCompatActivity
     Button captureBtn = findViewById(R.id.captureBtn);
     final Button recordBtn = findViewById(R.id.recordBtn);
 
+    retrofit = new Retrofit.Builder()
+            .baseUrl("https://shrouded-lake-86672.herokuapp.com/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build();
+
+    service = retrofit.create(API.class);
+
     captureBtn.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
@@ -137,6 +142,8 @@ public final class LivePreviewActivity extends AppCompatActivity
 
         if (isRecording) {
           // stop recording and release camera
+            preview.setVisibility(View.VISIBLE);
+            GIFimg.setVisibility(View.GONE);
           mediaRecorder.stop();  // stop the recording
           releaseMediaRecorder(); // release the MediaRecorder object
           mCamera.lock();         // take camera access back from MediaRecorder
@@ -146,6 +153,8 @@ public final class LivePreviewActivity extends AppCompatActivity
           isRecording = false;
         } else {
           // initialize video camera
+            preview.setVisibility(View.GONE);
+            GIFimg.setVisibility(View.VISIBLE);
           if (prepareVideoRecorder()) {
             // Camera is available and unlocked, MediaRecorder is prepared,
             // now you can start recording
@@ -189,6 +198,7 @@ public final class LivePreviewActivity extends AppCompatActivity
     // If there's no existing cameraSource, create one.
     if (cameraSource == null) {
       cameraSource = new CameraSource(this, graphicOverlay);
+      cameraSource.setFacing(CameraSource.CAMERA_FACING_FRONT);
     }
   }
 
@@ -370,9 +380,9 @@ public final class LivePreviewActivity extends AppCompatActivity
 
     Camera.Parameters params = mCamera.getParameters();
     params.setRotation(270);
+//    mCamera.setDisplayOrientation(90);
+    mediaRecorder.setOrientationHint(270);
     mCamera.setParameters(params);
-    mCamera.setDisplayOrientation(90);
-    mediaRecorder.setOrientationHint(90);
 
     // Step 1: Unlock and set camera to MediaRecorder
     mCamera.unlock();
@@ -384,7 +394,9 @@ public final class LivePreviewActivity extends AppCompatActivity
 //    mediaRecorder.setOrientationHint(90);
 
     // Step 3: Set a CamcorderProfile (requires API Level 8 or higher)
-    mediaRecorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_LOW));
+//    mediaRecorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_LOW));
+    mediaRecorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_480P));
+
 
     // Step 4: Set output file
     fileString = getOutputMediaFile(MEDIA_TYPE_VIDEO).toString();
@@ -416,20 +428,21 @@ public final class LivePreviewActivity extends AppCompatActivity
       mCamera.lock(); // lock camera for later use
 
       if(!fileString.equals("")){
-//        upload_video();
+        upload_video();
         Toast.makeText(getApplicationContext(), "Uploading Video to server ...", Toast.LENGTH_LONG).show();
       }
     }
   }
 
   private void upload_video(){
+
     File file = new File(fileString);
     RequestBody requestFile =
             RequestBody.create(MediaType.parse("multipart/form-data"), file);
 
 // MultipartBody.Part is used to send also the actual file name
     MultipartBody.Part body =
-            MultipartBody.Part.createFormData("video", file.getName(), requestFile);
+            MultipartBody.Part.createFormData("file", file.getName(), requestFile);
     fileString = "";
     API api = retrofit.create(API.class);
     Call<Response> response = api.upload(body);
@@ -438,9 +451,10 @@ public final class LivePreviewActivity extends AppCompatActivity
       @Override
       public void onResponse(Call<Response> call, retrofit2.Response<Response> response) {
         if(response.isSuccessful()){
-          Response res = response.body();
-          Toast.makeText(getApplicationContext(), res.getMessage(), Toast.LENGTH_LONG).show();
+          Toast.makeText(getApplicationContext(), response+"", Toast.LENGTH_LONG).show();
+          Log.d("LivePreview Activity : ", "SUCESS");
         }
+        Log.d("LivePreview Activity : ", "DONE");
       }
 
       @Override

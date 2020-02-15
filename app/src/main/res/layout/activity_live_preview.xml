@@ -9,17 +9,10 @@
     android:keepScreenOn="true"
     android:orientation="vertical">
 
-    <pl.droidsonroids.gif.GifImageView
-        android:id="@+id/outside_gif"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:scaleType="fitXY"
-        android:src="@drawable/giphy" />
 
     <com.google.firebase.samples.apps.mlkit.CameraSourcePreview
         android:id="@+id/inside_fire_preview"
-        android:layout_width="300dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/outside_gif">
 
@@ -28,9 +21,9 @@
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:contentDescription="allign eyes"
-            android:scaleType="fitStart"
-            app:srcCompat="@drawable/eyes"
-            android:paddingTop="40dp"/>
+            android:paddingBottom="100dp"
+            android:scaleType="centerInside"
+            app:srcCompat="@drawable/eyes" />
 
         <com.google.firebase.samples.apps.mlkit.GraphicOverlay
             android:id="@+id/fireFaceOverlay"
@@ -41,37 +34,55 @@
             android:layout_alignParentBottom="true" />
     </com.google.firebase.samples.apps.mlkit.CameraSourcePreview>
 
+    <pl.droidsonroids.gif.GifImageView
+        android:id="@+id/outside_gif"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:scaleType="fitXY"
+        android:src="@drawable/giphy"
+        android:visibility="gone"/>
+
 
     <LinearLayout
         android:id="@+id/control"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
+        android:layout_centerHorizontal="true"
         android:layout_alignParentBottom="true"
-        android:background="#ffff"
-        android:orientation="horizontal">
-
+        android:layout_marginBottom="15dp"
+        android:orientation="vertical">
 
         <Button
             android:id="@+id/recordBtn"
             android:layout_margin="4dp"
             android:layout_width="60dp"
             android:layout_height="60dp"
+            android:layout_gravity="center"
             android:background="@android:color/holo_red_light"/>
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Please adjust your eyes and tap to start"
+            android:textColor="#fff"
+            android:layout_marginTop="10dp"/>
 
         <Button
             android:id="@+id/captureBtn"
             android:layout_margin="4dp"
             android:layout_width="60dp"
             android:layout_height="60dp"
-            android:background="@android:color/holo_blue_bright"/>
+            android:background="@android:color/holo_blue_bright"
+            android:visibility="gone"/>
 
         <ToggleButton
             android:id="@+id/facingswitch"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:background="@layout/toggle_style"
-            android:checked="false"
+            android:checked="true"
             android:textOff=""
             android:textOn=""
             android:visibility="gone"/>

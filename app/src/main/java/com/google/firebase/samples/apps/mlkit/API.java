@@ -9,7 +9,7 @@ import retrofit2.http.Part;
 public interface API {
 
     @Multipart
-    @POST("upload")
+    @POST("image")
     Call<Response> upload(
             @Part MultipartBody.Part video
     );

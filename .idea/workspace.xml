@@ -109,7 +109,7 @@
   <component name="DefaultGradleProjectSettings">
     <option name="isMigrated" value="true" />
   </component>
-  <component name="ExecutionTargetManager" SELECTED_TARGET="a292d8940304" />
+  <component name="ExecutionTargetManager" SELECTED_TARGET="3.7_WVGA_Nexus_One_Edited_API_27" />
   <component name="ExternalProjectsData">
     <projectState path="$PROJECT_DIR$">
       <ProjectState />
@@ -124,11 +124,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/com/google/firebase/samples/apps/mlkit/LivePreviewActivity.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="146">
-              <caret line="419" column="7" lean-forward="true" selection-start-line="419" selection-start-column="7" selection-end-line="419" selection-end-column="7" />
+            <state relative-caret-position="17">
+              <caret line="90" column="40" lean-forward="true" selection-start-line="90" selection-start-column="40" selection-end-line="90" selection-end-column="40" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -136,14 +136,12 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/google/firebase/samples/apps/mlkit/API.java">
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/activity_live_preview.xml">
+          <provider editor-type-id="android-designer2" />
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="221">
-              <caret line="13" column="42" selection-start-line="13" selection-start-column="42" selection-end-line="13" selection-end-column="42" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
+            <state relative-caret-position="243">
+              <caret line="23" column="41" lean-forward="true" selection-start-line="23" selection-start-column="41" selection-end-line="23" selection-end-column="41" />
             </state>
           </provider>
         </entry>
@@ -175,6 +173,8 @@
       <find>cameraSource.camera</find>
       <find>CAMERA_FACING_FRONT</find>
       <find>setFacing</find>
+      <find>cameraSource</find>
+      <find>CameraSou</find>
     </findStrings>
     <replaceStrings>
       <replace>inside_fire_preview</replace>
@@ -188,12 +188,12 @@
       <list>
         <option value="$PROJECT_DIR$/app/src/main/java/com/google/firebase/samples/apps/mlkit/CameraSource.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/google/firebase/samples/apps/mlkit/CameraSourcePreview.java" />
-        <option value="$PROJECT_DIR$/app/src/main/res/layout/activity_live_preview.xml" />
         <option value="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/google/firebase/samples/apps/mlkit/API.java" />
         <option value="$PROJECT_DIR$/app/build.gradle" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/google/firebase/samples/apps/mlkit/Response.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/google/firebase/samples/apps/mlkit/API.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/google/firebase/samples/apps/mlkit/LivePreviewActivity.java" />
+        <option value="$PROJECT_DIR$/app/src/main/res/layout/activity_live_preview.xml" />
       </list>
     </option>
   </component>
@@ -208,11 +208,26 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="ProjectPane" />
       <pane id="PackagesPane" />
+      <pane id="ProjectPane" />
       <pane id="AndroidView">
         <subPane>
           <expand>
+            <path>
+              <item name="android-firebase-mlkit" type="1abcf292:AndroidViewProjectNode" />
+              <item name="app" type="feadf853:AndroidModuleNode" />
+            </path>
+            <path>
+              <item name="android-firebase-mlkit" type="1abcf292:AndroidViewProjectNode" />
+              <item name="app" type="feadf853:AndroidModuleNode" />
+              <item name="java" type="edd41e36:AndroidSourceTypeNode" />
+            </path>
+            <path>
+              <item name="android-firebase-mlkit" type="1abcf292:AndroidViewProjectNode" />
+              <item name="app" type="feadf853:AndroidModuleNode" />
+              <item name="java" type="edd41e36:AndroidSourceTypeNode" />
+              <item name="mlkit" type="cbb59c9e:AndroidPsiDirectoryNode" />
+            </path>
             <path>
               <item name="android-firebase-mlkit" type="1abcf292:AndroidViewProjectNode" />
               <item name="Gradle Scripts" type="ae0cef3a:AndroidBuildScriptsGroupNode" />
@@ -225,8 +240,8 @@
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="DeviceAndSnapshotComboBoxAction.selectedDevice" value="22e59afa7d15" />
-    <property name="DeviceAndSnapshotComboBoxAction.selectionTime" value="2020-01-09T10:37:42.749Z" />
+    <property name="DeviceAndSnapshotComboBoxAction.selectedDevice" value="a292d8940304" />
+    <property name="DeviceAndSnapshotComboBoxAction.selectionTime" value="2020-02-13T05:31:32.822Z" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="android.project.structure.last.selected" value="SDK Location" />
     <property name="android.project.structure.proportion" value="0.15" />
@@ -331,10 +346,11 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1382" height="784" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info id="Captures" order="0" side_tool="true" weight="0.25" />
       <window_info id="Capture Tool" order="1" />
-      <window_info active="true" content_ui="combo" id="Project" order="2" visible="true" weight="0.17397882" />
+      <window_info content_ui="combo" id="Project" order="2" visible="true" weight="0.17397882" />
       <window_info id="Structure" order="3" side_tool="true" />
       <window_info id="Build Variants" order="4" side_tool="true" />
       <window_info id="Image Layers" order="5" />
@@ -359,7 +375,7 @@
       <window_info anchor="right" id="Flutter Inspector" order="4" />
       <window_info anchor="right" id="Flutter Outline" order="5" />
       <window_info anchor="right" id="Palette&#9;" order="6" />
-      <window_info anchor="right" id="Preview" order="7" weight="0.27987897" />
+      <window_info active="true" anchor="right" id="Preview" order="7" visible="true" weight="0.27987897" />
       <window_info anchor="right" id="Assistant" order="8" weight="0.3290469" />
     </layout>
     <layout-to-restore>
@@ -449,13 +465,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/google/firebase/samples/apps/mlkit/ChooserActivity.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="137">
-          <caret line="49" column="37" selection-start-line="49" selection-start-column="37" selection-end-line="49" selection-end-column="37" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/google/firebase/samples/apps/mlkit/CameraSourcePreview.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="102">
@@ -485,17 +494,24 @@
     <entry file="file://$USER_HOME$/AppData/Local/Android/Sdk/sources/android-27/android/widget/CompoundButton.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="208">
-          <caret line="190" column="16" selection-start-line="190" selection-start-column="16" selection-end-line="190" selection-end-column="16" />
+          <caret line="209" column="28" selection-start-line="209" selection-start-column="28" selection-end-line="209" selection-end-column="28" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/google/firebase/samples/apps/mlkit/ChooserActivity.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2125">
+          <caret line="160" column="32" selection-start-line="160" selection-start-column="32" selection-end-line="160" selection-end-column="32" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/AndroidManifest.xml">
-      <provider editor-type-id="android-manifest" />
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="431">
+        <state relative-caret-position="476">
           <caret line="28" column="50" selection-start-line="28" selection-start-column="50" selection-end-line="28" selection-end-column="50" />
         </state>
       </provider>
+      <provider editor-type-id="android-manifest" />
     </entry>
     <entry file="file://$PROJECT_DIR$/app/build.gradle">
       <provider selected="true" editor-type-id="text-editor">
@@ -504,31 +520,27 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/activity_live_preview.xml">
-      <provider editor-type-id="android-designer2" />
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="328">
-          <caret line="42" selection-start-line="42" selection-end-line="42" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/google/firebase/samples/apps/mlkit/Response.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="68">
-          <caret line="4" column="13" selection-start-line="4" selection-start-column="13" selection-end-line="4" selection-end-column="13" />
+        <state relative-caret-position="445">
+          <caret line="28" column="23" selection-start-line="28" selection-start-column="23" selection-end-line="28" selection-end-column="23" />
           <folding>
-            <element signature="e#259#260#0" expanded="true" />
-            <element signature="e#288#289#0" expanded="true" />
+            <element signature="e#252#253#0" expanded="true" />
+            <element signature="e#281#282#0" expanded="true" />
             <element signature="e#322#323#0" expanded="true" />
             <element signature="e#352#353#0" expanded="true" />
+            <element signature="e#386#387#0" expanded="true" />
+            <element signature="e#422#423#0" expanded="true" />
+            <element signature="e#468#469#0" expanded="true" />
+            <element signature="e#506#507#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/google/firebase/samples/apps/mlkit/API.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="221">
-          <caret line="13" column="42" selection-start-line="13" selection-start-column="42" selection-end-line="13" selection-end-column="42" />
+        <state relative-caret-position="204">
+          <caret line="12" column="25" selection-start-line="12" selection-start-column="19" selection-end-line="12" selection-end-column="25" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -537,11 +549,19 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/google/firebase/samples/apps/mlkit/LivePreviewActivity.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="146">
-          <caret line="419" column="7" lean-forward="true" selection-start-line="419" selection-start-column="7" selection-end-line="419" selection-end-column="7" />
+        <state relative-caret-position="17">
+          <caret line="90" column="40" lean-forward="true" selection-start-line="90" selection-start-column="40" selection-end-line="90" selection-end-column="40" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/activity_live_preview.xml">
+      <provider editor-type-id="android-designer2" />
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="243">
+          <caret line="23" column="41" lean-forward="true" selection-start-line="23" selection-start-column="41" selection-end-line="23" selection-end-column="41" />
         </state>
       </provider>
     </entry>
