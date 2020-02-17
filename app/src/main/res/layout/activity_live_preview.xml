@@ -59,8 +59,19 @@
             android:layout_width="60dp"
             android:layout_height="60dp"
             android:layout_gravity="center"
-            android:background="@android:color/holo_red_light"/>
+            android:background="@drawable/circle"/>
 
+        <TextView
+            android:id="@+id/time_left_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:drawableLeft="@drawable/circle"
+            android:drawablePadding="5dp"
+            android:text="10:00"
+            android:textColor="@android:color/white"
+            android:gravity="center"
+            android:visibility="gone"/>
 
         <TextView
             android:id="@+id/record_msg_tv"

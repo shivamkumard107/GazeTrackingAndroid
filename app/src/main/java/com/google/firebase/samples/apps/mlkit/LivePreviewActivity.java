@@ -20,8 +20,11 @@ import android.hardware.Camera;
 import android.media.CamcorderProfile;
 import android.media.CameraProfile;
 import android.media.MediaRecorder;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Environment;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityCompat.OnRequestPermissionsResultCallback;
 import android.support.v4.content.ContextCompat;
@@ -39,6 +42,14 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.google.android.gms.common.annotation.KeepName;
+import com.google.android.gms.tasks.Continuation;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 //import com.google.firebase.ml.common.FirebaseMLException;
 
 import java.io.File;
@@ -46,6 +57,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Parameter;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -85,6 +97,9 @@ public final class LivePreviewActivity extends AppCompatActivity
     String fileString = "";
     Retrofit retrofit;
     API service;
+
+    private long mTimeLeftInMillis = 500000;
+    private CountDownTimer countDownTimer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -140,6 +155,8 @@ public final class LivePreviewActivity extends AppCompatActivity
         });
 
         final TextView recordTV = findViewById(R.id.record_msg_tv);
+        final TextView timeleftTV = findViewById(R.id.time_left_tv);
+
 
         recordBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -147,7 +164,10 @@ public final class LivePreviewActivity extends AppCompatActivity
 
                 if (isRecording) {
                     // stop recording and release camera
-                    recordTV.setText("Don't move your head and focus on candle");
+                    recordBtn.setBackground(getDrawable(R.drawable.circle));
+                    if(countDownTimer != null) countDownTimer.cancel();
+                    recordTV.setText("Please adjust your eyes and tap to start");
+                    timeleftTV.setVisibility(View.GONE);
                     preview.setVisibility(View.VISIBLE);
                     GIFimg.setVisibility(View.GONE);
                     mediaRecorder.stop();  // stop the recording
@@ -155,11 +175,14 @@ public final class LivePreviewActivity extends AppCompatActivity
                     mCamera.lock();         // take camera access back from MediaRecorder
 
                     // inform the user that recording has stopped
-                    recordBtn.setText("Cap");
+//                    recordBtn.setText("Cap");
                     isRecording = false;
+
                 } else {
                     // initialize video camera
-                    recordTV.setText("Please adjust your eyes and tap to start");
+                    timeleftTV.setVisibility(View.VISIBLE);
+                    recordBtn.setBackground(getDrawable(R.drawable.ic_pause_circle_outline_black_24dp));
+                    recordTV.setText("Don't move your head and focus on candle");
                     preview.setVisibility(View.GONE);
                     GIFimg.setVisibility(View.VISIBLE);
                     if (prepareVideoRecorder()) {
@@ -168,13 +191,32 @@ public final class LivePreviewActivity extends AppCompatActivity
                         mediaRecorder.start();
 
                         // inform the user that recording has started
-                        recordBtn.setText("Stop");
+//                        recordBtn.setText("Stop");
                         isRecording = true;
                     } else {
                         // prepare didn't work, release the camera
                         releaseMediaRecorder();
                         // inform user
                     }
+
+
+                    countDownTimer = new CountDownTimer(mTimeLeftInMillis, 1000) {
+                        @Override
+                        public void onTick(long millisUntilFinished) {
+                            int mins = (int) millisUntilFinished / (60 * 1000);
+                            int seconds = ((int)(millisUntilFinished/1000) - (mins*60));
+                            DecimalFormat format = new DecimalFormat("00");
+                            String timeleftStr = format.format(mins) + ":" + format.format(seconds);
+                            timeleftTV.setText(timeleftStr);
+                        }
+
+                        @Override
+                        public void onFinish() {
+                            Toast.makeText(getApplicationContext(), "Countdown Over", Toast.LENGTH_SHORT).show();
+                            recordBtn.callOnClick();
+                        }
+                    };
+                    countDownTimer.start();
                 }
 
             }
@@ -436,10 +478,64 @@ public final class LivePreviewActivity extends AppCompatActivity
             mCamera.lock(); // lock camera for later use
 
             if (!fileString.equals("")) {
-                upload_video();
+                upload_to_firebase();
                 Toast.makeText(getApplicationContext(), "Uploading Video to server ...", Toast.LENGTH_LONG).show();
             }
         }
+    }
+
+    private void upload_to_firebase(){
+        StorageReference mStorageRef = FirebaseStorage.getInstance().getReference();
+        File videoFile = new File(fileString);
+        Uri file = Uri.fromFile(videoFile);
+        fileString = "";
+        final StorageReference ref = mStorageRef.child("images").child(videoFile.getName());
+        UploadTask uploadTask = ref.putFile(file);
+
+        Task<Uri> urlTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+            @Override
+            public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                if (!task.isSuccessful()) {
+                    throw task.getException();
+                }
+
+                // Continue with the task to get the download URL
+                return ref.getDownloadUrl();
+            }
+        }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+            @Override
+            public void onComplete(@NonNull Task<Uri> task) {
+                if (task.isSuccessful()) {
+                    Uri downloadUri = task.getResult();
+                    Toast.makeText(getApplicationContext(), downloadUri.toString(), Toast.LENGTH_LONG).show();
+                    send_url_to_server(downloadUri.toString());
+                } else {
+                    // Handle failures
+                    // ...
+                }
+            }
+        });
+
+    }
+
+    private void send_url_to_server(String url){
+        API api = retrofit.create(API.class);
+        Call<Response> response = api.send_url(url);
+        response.enqueue(new Callback<Response>() {
+            @Override
+            public void onResponse(Call<Response> call, retrofit2.Response<Response> response) {
+                if (response.isSuccessful()) {
+                    Toast.makeText(getApplicationContext(), response + "", Toast.LENGTH_LONG).show();
+                    Log.d("LivePreview Activity : ", "SUCESS");
+                }
+                Log.d("LivePreview Activity : ", "SUCESS");
+            }
+
+            @Override
+            public void onFailure(Call<Response> call, Throwable t) {
+                Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     private void upload_video() {
