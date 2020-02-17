@@ -703,9 +703,9 @@ public class CameraSource {
         // the camera to add pending frame(s) while we are running detection on the current
         // frame.
 
-        try {
+        /*try {
           synchronized (processorLock) {
-            Log.d(TAG, "Process an image");
+            *//*Log.d(TAG, "Process an image");
             frameProcessor.process(
                 data,
                 new FrameMetadata.Builder()
@@ -714,13 +714,13 @@ public class CameraSource {
                     .setRotation(rotation)
                     .setCameraFacing(facing)
                     .build(),
-                graphicOverlay);
+                graphicOverlay);*//*
           }
         } catch (Throwable t) {
           Log.e(TAG, "Exception thrown from receiver.", t);
         } finally {
           camera.addCallbackBuffer(data.array());
-        }
+        }*/
       }
     }
   }
