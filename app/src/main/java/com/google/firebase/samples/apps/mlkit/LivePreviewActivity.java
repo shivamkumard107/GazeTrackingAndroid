@@ -98,7 +98,7 @@ public final class LivePreviewActivity extends AppCompatActivity
     Retrofit retrofit;
     API service;
 
-    private long mTimeLeftInMillis = 500000;
+    private long mTimeLeftInMillis = 60000;
     private CountDownTimer countDownTimer;
 
     @Override
@@ -107,6 +107,7 @@ public final class LivePreviewActivity extends AppCompatActivity
         Log.d(TAG, "onCreate");
 
         setContentView(R.layout.activity_live_preview);
+        Toast.makeText(this, "http://" +getIntent().getExtras().getString("ip") + ":4555", Toast.LENGTH_SHORT).show();
 
         preview = (CameraSourcePreview) findViewById(R.id.inside_fire_preview);
         GIFimg = findViewById(R.id.outside_gif);
@@ -141,7 +142,7 @@ public final class LivePreviewActivity extends AppCompatActivity
         final Button recordBtn = findViewById(R.id.recordBtn);
 
         retrofit = new Retrofit.Builder()
-                .baseUrl("https://shrouded-lake-86672.herokuapp.com/")
+                .baseUrl("http://" +getIntent().getExtras().getString("ip") + ":4555")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 

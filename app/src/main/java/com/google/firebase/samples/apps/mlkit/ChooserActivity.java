@@ -29,6 +29,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -40,20 +41,21 @@ import java.util.List;
  * all available testing Activities.
  */
 public final class ChooserActivity extends AppCompatActivity
-    implements OnRequestPermissionsResultCallback, AdapterView.OnItemClickListener {
+        implements OnRequestPermissionsResultCallback, AdapterView.OnItemClickListener {
   private static final String TAG = "ChooserActivity";
   private static final int PERMISSION_REQUESTS = 1;
   public Button startButton;
+  private EditText ip;
 
   private static final Class<?>[] CLASSES =
-      new Class<?>[] {
-        LivePreviewActivity.class//, StillImageActivity.class,
-      };
+          new Class<?>[] {
+                  LivePreviewActivity.class//, StillImageActivity.class,
+          };
 
   private static final int[] DESCRIPTION_IDS =
-      new int[] {
-        R.string.desc_camera_source_activity, R.string.desc_still_image_activity,
-      };
+          new int[] {
+                  R.string.desc_camera_source_activity, R.string.desc_still_image_activity,
+          };
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -63,13 +65,16 @@ public final class ChooserActivity extends AppCompatActivity
     setContentView(R.layout.activity_chooser);
 
     startButton = (Button) findViewById(R.id.start);
+    ip = findViewById(R.id.ip);
 
     startButton.setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            Class<?> clicked = CLASSES[0];
-            startActivity(new Intent( getApplicationContext(), clicked));
-        }
+      @Override
+      public void onClick(View v) {
+        Class<?> clicked = CLASSES[0];
+        Intent i = new Intent( getApplicationContext(), clicked);
+        i.putExtra("ip", ip.getText().toString());
+        startActivity(i);
+      }
     });
 
     // Set up ListView and Adapter
@@ -95,8 +100,8 @@ public final class ChooserActivity extends AppCompatActivity
   private String[] getRequiredPermissions() {
     try {
       PackageInfo info =
-          this.getPackageManager()
-              .getPackageInfo(this.getPackageName(), PackageManager.GET_PERMISSIONS);
+              this.getPackageManager()
+                      .getPackageInfo(this.getPackageName(), PackageManager.GET_PERMISSIONS);
       String[] ps = info.requestedPermissions;
       if (ps != null && ps.length > 0) {
         return ps;
@@ -127,13 +132,13 @@ public final class ChooserActivity extends AppCompatActivity
 
     if (!allNeededPermissions.isEmpty()) {
       ActivityCompat.requestPermissions(
-          this, allNeededPermissions.toArray(new String[0]), PERMISSION_REQUESTS);
+              this, allNeededPermissions.toArray(new String[0]), PERMISSION_REQUESTS);
     }
   }
 
   private static boolean isPermissionGranted(Context context, String permission) {
     if (ContextCompat.checkSelfPermission(context, permission)
-        == PackageManager.PERMISSION_GRANTED) {
+            == PackageManager.PERMISSION_GRANTED) {
       Log.i(TAG, "Permission granted: " + permission);
       return true;
     }
@@ -160,7 +165,7 @@ public final class ChooserActivity extends AppCompatActivity
 
       if (convertView == null) {
         LayoutInflater inflater =
-            (LayoutInflater) context.getSystemService(LAYOUT_INFLATER_SERVICE);
+                (LayoutInflater) context.getSystemService(LAYOUT_INFLATER_SERVICE);
         view = inflater.inflate(android.R.layout.simple_list_item_2, null);
       }
 
