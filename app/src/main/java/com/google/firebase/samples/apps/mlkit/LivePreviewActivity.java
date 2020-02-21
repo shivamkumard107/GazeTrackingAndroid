@@ -13,6 +13,7 @@
 // limitations under the License.
 package com.google.firebase.samples.apps.mlkit;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -61,10 +62,14 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
+import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import pl.droidsonroids.gif.GifImageView;
 import retrofit2.Call;
@@ -94,12 +99,14 @@ public final class LivePreviewActivity extends AppCompatActivity
     public static final int MEDIA_TYPE_VIDEO = 2;
     public static final String BASE_URL = "https://shrouded-lake-86672.herokuapp.com/";
 
-    String fileString = "";
-    Retrofit retrofit;
-    API service;
+    private String fileString = "";
+    private Retrofit retrofit;
+    private API service;
+    private boolean uiChange = true, isRunning = true;
 
     private long mTimeLeftInMillis = 60000;
     private CountDownTimer countDownTimer;
+    private ArrayList<Integer> scoreList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,8 +114,8 @@ public final class LivePreviewActivity extends AppCompatActivity
         Log.d(TAG, "onCreate");
 
         setContentView(R.layout.activity_live_preview);
-        Toast.makeText(this, "http://" +getIntent().getExtras().getString("ip") + ":4555", Toast.LENGTH_SHORT).show();
-
+        Toast.makeText(this, "http://" + getIntent().getExtras().getString("ip") + ":4555", Toast.LENGTH_SHORT).show();
+        scoreList = new ArrayList<>();
         preview = (CameraSourcePreview) findViewById(R.id.inside_fire_preview);
         GIFimg = findViewById(R.id.outside_gif);
         if (preview == null) {
@@ -141,8 +148,14 @@ public final class LivePreviewActivity extends AppCompatActivity
         Button captureBtn = findViewById(R.id.captureBtn);
         final Button recordBtn = findViewById(R.id.recordBtn);
 
+        OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                .readTimeout(60, TimeUnit.SECONDS)
+                .connectTimeout(60, TimeUnit.SECONDS)
+                .build();
+
         retrofit = new Retrofit.Builder()
-                .baseUrl("http://" +getIntent().getExtras().getString("ip") + ":4555")
+                .client(okHttpClient)
+                .baseUrl("http://" + getIntent().getExtras().getString("ip") + ":4555")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
@@ -165,12 +178,16 @@ public final class LivePreviewActivity extends AppCompatActivity
 
                 if (isRecording) {
                     // stop recording and release camera
-                    recordBtn.setBackground(getDrawable(R.drawable.circle));
-                    if(countDownTimer != null) countDownTimer.cancel();
-                    recordTV.setText("Please adjust your eyes and tap to start");
-                    timeleftTV.setVisibility(View.GONE);
-                    preview.setVisibility(View.VISIBLE);
-                    GIFimg.setVisibility(View.GONE);
+                    if (countDownTimer != null) countDownTimer.cancel();
+                    if (uiChange) {
+                        recordBtn.setBackground(getDrawable(R.drawable.circle));
+                        recordTV.setText("Please adjust your eyes and tap to start");
+                        timeleftTV.setVisibility(View.GONE);
+                        preview.setVisibility(View.VISIBLE);
+                        GIFimg.setVisibility(View.GONE);
+                        isRunning = false;
+                    }
+
                     mediaRecorder.stop();  // stop the recording
                     releaseMediaRecorder(); // release the MediaRecorder object
                     mCamera.lock();         // take camera access back from MediaRecorder
@@ -181,11 +198,15 @@ public final class LivePreviewActivity extends AppCompatActivity
 
                 } else {
                     // initialize video camera
-                    timeleftTV.setVisibility(View.VISIBLE);
-                    recordBtn.setBackground(getDrawable(R.drawable.ic_pause_circle_outline_black_24dp));
-                    recordTV.setText("Don't move your head and focus on candle");
-                    preview.setVisibility(View.GONE);
-                    GIFimg.setVisibility(View.VISIBLE);
+                    if (uiChange) {
+//                        timeleftTV.setVisibility(View.VISIBLE);
+                        recordBtn.setBackground(getDrawable(R.drawable.ic_pause_circle_outline_black_24dp));
+                        recordTV.setText("Don't move your head and focus on candle");
+                        preview.setVisibility(View.GONE);
+                        GIFimg.setVisibility(View.VISIBLE);
+                        isRunning = true;
+                    }
+
                     if (prepareVideoRecorder()) {
                         // Camera is available and unlocked, MediaRecorder is prepared,
                         // now you can start recording
@@ -205,7 +226,7 @@ public final class LivePreviewActivity extends AppCompatActivity
                         @Override
                         public void onTick(long millisUntilFinished) {
                             int mins = (int) millisUntilFinished / (60 * 1000);
-                            int seconds = ((int)(millisUntilFinished/1000) - (mins*60));
+                            int seconds = ((int) (millisUntilFinished / 1000) - (mins * 60));
                             DecimalFormat format = new DecimalFormat("00");
                             String timeleftStr = format.format(mins) + ":" + format.format(seconds);
                             timeleftTV.setText(timeleftStr);
@@ -214,7 +235,11 @@ public final class LivePreviewActivity extends AppCompatActivity
                         @Override
                         public void onFinish() {
                             Toast.makeText(getApplicationContext(), "Countdown Over", Toast.LENGTH_SHORT).show();
+                            uiChange = false;
                             recordBtn.callOnClick();
+
+                            recordBtn.callOnClick();
+                            uiChange = true;
                         }
                     };
                     countDownTimer.start();
@@ -360,7 +385,6 @@ public final class LivePreviewActivity extends AppCompatActivity
     }
 
 
-    //  SAVE PICTURE
     private Camera.PictureCallback mPicture = new Camera.PictureCallback() {
 
         @Override
@@ -485,7 +509,17 @@ public final class LivePreviewActivity extends AppCompatActivity
         }
     }
 
-    private void upload_to_firebase(){
+    private void upload_to_firebase() {
+
+        final ProgressDialog progressDialog = new ProgressDialog(LivePreviewActivity.this);
+        if (uiChange) {
+            progressDialog.setMessage("Uploading to server...");
+            progressDialog.setCanceledOnTouchOutside(false);
+            progressDialog.setCancelable(false);
+            progressDialog.show();
+        } else {
+            Toast.makeText(getApplicationContext(), "Sending chunk data...", Toast.LENGTH_SHORT).show();
+        }
         StorageReference mStorageRef = FirebaseStorage.getInstance().getReference();
         File videoFile = new File(fileString);
         Uri file = Uri.fromFile(videoFile);
@@ -510,6 +544,7 @@ public final class LivePreviewActivity extends AppCompatActivity
                     Uri downloadUri = task.getResult();
                     Toast.makeText(getApplicationContext(), downloadUri.toString(), Toast.LENGTH_LONG).show();
                     send_url_to_server(downloadUri.toString());
+                    if (uiChange) progressDialog.dismiss();
                 } else {
                     // Handle failures
                     // ...
@@ -519,24 +554,93 @@ public final class LivePreviewActivity extends AppCompatActivity
 
     }
 
-    private void send_url_to_server(String url){
+    private void send_url_to_server(String url) {
+        final ProgressDialog progressDialog = new ProgressDialog(LivePreviewActivity.this);
+        if (!isRunning) {
+            progressDialog.setMessage("Please wait while we are calculating results...");
+            progressDialog.setCancelable(false);
+            progressDialog.setCanceledOnTouchOutside(false);
+            progressDialog.show();
+        }
         API api = retrofit.create(API.class);
-        Call<Response> response = api.send_url(url);
-        response.enqueue(new Callback<Response>() {
+//        Call<Response> response = api.send_url(url);
+        Param param = new Param(url);
+        Call<JsonResponse> response = api.send_url(param);
+        response.enqueue(new Callback<JsonResponse>() {
             @Override
-            public void onResponse(Call<Response> call, retrofit2.Response<Response> response) {
+            public void onResponse(Call<JsonResponse> call, retrofit2.Response<JsonResponse> response) {
+
+//                Toast.makeText(getApplicationContext(), response + "", Toast.LENGTH_LONG).show();
                 if (response.isSuccessful()) {
-                    Toast.makeText(getApplicationContext(), response + "", Toast.LENGTH_LONG).show();
-                    Log.d("LivePreview Activity : ", "SUCESS");
+                    Log.d("LivePreview Activity : ", response + "");
+
+                    Float score = response.body().getMessage();
+                    if (score != -1) {
+                        if (!isRunning) {
+                            int totalScore = (int) (score * 100);
+                            for (int i = 0; i < scoreList.size(); i++)
+                                totalScore += scoreList.get(i);
+                            if (scoreList.size() > 0)
+                                totalScore = totalScore / scoreList.size();
+                            scoreList.clear();
+                            progressDialog.dismiss();
+                            if (totalScore > 70) {
+                                Toast.makeText(getApplicationContext(), "You're " + totalScore + "% focussed", Toast.LENGTH_LONG).show();
+                            }else {
+                                Toast.makeText(getApplicationContext(), "You're not focussed, accuracy - " + totalScore + "%", Toast.LENGTH_LONG).show();
+                            }
+
+                        } else
+                            scoreList.add((int) (score * 100));
+
+                    }
+
                 }
                 Log.d("LivePreview Activity : ", "SUCESS");
+                if (progressDialog.isShowing()) progressDialog.dismiss();
             }
 
             @Override
-            public void onFailure(Call<Response> call, Throwable t) {
-                Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_LONG).show();
+            public void onFailure(Call<JsonResponse> call, Throwable t) {
+                if (progressDialog.isShowing()) progressDialog.dismiss();
+                Toast.makeText(getApplicationContext(), t.getMessage() + "", Toast.LENGTH_LONG).show();
+
             }
         });
+//        response.enqueue(new Callback<Response>() {
+//            @Override
+//            public void onResponse(Call<Response> call, retrofit2.Response<Response> response) {
+//                if (response.isSuccessful()) {
+//                    Log.d("LivePreview Activity : ", response+"");
+//                    Integer score = response.body().getScore();
+//                    if (score != -1){
+//                        if(!isRunning){
+//                            int totalScore = score;
+//                            for (int i=0; i<scoreList.size(); i++)
+//                                totalScore += scoreList.get(i);
+//                            totalScore = totalScore/scoreList.size();
+//                            scoreList.clear();
+//                            progressDialog.dismiss();
+//                            if (totalScore > 70){
+//                                Toast.makeText(getApplicationContext(), "You're " + totalScore + "% focussed", Toast.LENGTH_LONG).show();
+//                            }
+//
+//                        }else
+//                            scoreList.add(score);
+//
+//                    }
+//
+//                }
+//                Log.d("LivePreview Activity : ", "SUCESS");
+//                if(progressDialog.isShowing()) progressDialog.dismiss();
+//            }
+//
+//            @Override
+//            public void onFailure(Call<Response> call, Throwable t) {
+//                progressDialog.cancel();
+//                Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_LONG).show();
+//            }
+//        });
     }
 
     private void upload_video() {

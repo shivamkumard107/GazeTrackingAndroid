@@ -10,6 +10,9 @@ public class Response {
     @SerializedName("message")
     String message;
 
+    @SerializedName("Message")
+    int score;
+
     public int getSucess() {
         return sucess;
     }
@@ -29,8 +32,17 @@ public class Response {
     public Response() {
     }
 
-    public Response(int sucess, String message) {
+    public int getScore() {
+        return score;
+    }
+
+    public void setScore(int score) {
+        this.score = score;
+    }
+
+    public Response(int sucess, String message, int score) {
         this.sucess = sucess;
         this.message = message;
+        this.score = score;
     }
 }
