@@ -305,7 +305,7 @@ public class CameraSource {
           .contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO)) {
         parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO);
       } else {
-        Log.i(TAG, "Camera auto focus is not supported on this device.");
+        Log.i(TAG, "Camera auto mlkit is not supported on this device.");
       }
     }
 

@@ -201,7 +201,7 @@ public final class LivePreviewActivity extends AppCompatActivity
                     if (uiChange) {
 //                        timeleftTV.setVisibility(View.VISIBLE);
                         recordBtn.setBackground(getDrawable(R.drawable.ic_pause_circle_outline_black_24dp));
-                        recordTV.setText("Don't move your head and focus on candle");
+                        recordTV.setText("Don't move your head and mlkit on candle");
                         preview.setVisibility(View.GONE);
                         GIFimg.setVisibility(View.VISIBLE);
                         isRunning = true;
