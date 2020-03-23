@@ -15,6 +15,7 @@ package com.google.firebase.samples.apps.mlkit;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
@@ -29,6 +30,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityCompat.OnRequestPermissionsResultCallback;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -37,6 +39,7 @@ import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -108,6 +111,7 @@ public final class LivePreviewActivity extends AppCompatActivity
     private long mTimeLeftInMillis = 60000;
     private CountDownTimer countDownTimer;
     private ArrayList<Integer> scoreList;
+    private ImageView dot;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -119,6 +123,7 @@ public final class LivePreviewActivity extends AppCompatActivity
         scoreList = new ArrayList<>();
         preview = (CameraSourcePreview) findViewById(R.id.inside_fire_preview);
         GIFimg = findViewById(R.id.outside_gif);
+        dot = findViewById(R.id.dot);
         if (preview == null) {
             Log.d(TAG, "Preview is null");
         }
@@ -186,6 +191,7 @@ public final class LivePreviewActivity extends AppCompatActivity
                         timeleftTV.setVisibility(View.GONE);
                         preview.setVisibility(View.VISIBLE);
                         GIFimg.setVisibility(View.GONE);
+                        dot.setVisibility(View.GONE);
                         isRunning = false;
                     }
 
@@ -205,6 +211,7 @@ public final class LivePreviewActivity extends AppCompatActivity
                         recordTV.setText("Don't move your head and mlkit on candle");
                         preview.setVisibility(View.GONE);
                         GIFimg.setVisibility(View.VISIBLE);
+                        dot.setVisibility(View.VISIBLE);
                         isRunning = true;
                     }
 
@@ -586,6 +593,22 @@ public final class LivePreviewActivity extends AppCompatActivity
                             scoreList.clear();
                             progressDialog.dismiss();
                             Toast.makeText(getApplicationContext(), "You're " + totalScore + "% focused", Toast.LENGTH_LONG).show();
+                            new AlertDialog.Builder(LivePreviewActivity.this)
+                                    .setTitle("Your overall focus")
+                                    .setMessage(totalScore + "%")
+
+                                    // Specifying a listener allows you to take an action before dismissing the dialog.
+                                    // The dialog is automatically dismissed when a dialog button is clicked.
+                                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            // Continue with delete operation
+                                        }
+                                    })
+
+                                    // A null listener allows the button to dismiss the dialog and take no further action.
+                                    .setNegativeButton(android.R.string.ok, null)
+                                    .setIcon(android.R.drawable.ic_dialog_info)
+                                    .show();
                         } else
                             scoreList.add((int) (score * 100));
 
