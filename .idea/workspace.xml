@@ -55,11 +55,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/com/google/firebase/samples/apps/mlkit/LivePreviewActivity.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="311">
-              <caret line="117" column="38" selection-start-line="117" selection-start-column="32" selection-end-line="117" selection-end-column="38" />
+            <state relative-caret-position="264">
+              <caret line="588" column="95" selection-start-line="588" selection-start-column="95" selection-end-line="588" selection-end-column="95" />
               <folding>
                 <element signature="e#0#26350#0" expanded="true" />
                 <element signature="imports" expanded="true" />
@@ -84,7 +84,7 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/activity_chooser.xml">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="300">
@@ -188,9 +188,9 @@
         <option value="$PROJECT_DIR$/app/src/main/java/com/google/firebase/samples/apps/mlkit/JsonResponse.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/google/firebase/samples/apps/mlkit/API.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/google/firebase/samples/apps/mlkit/Param.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/google/firebase/samples/apps/mlkit/LivePreviewActivity.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/google/firebase/samples/apps/mlkit/ChooserActivity.java" />
         <option value="$PROJECT_DIR$/app/src/main/res/layout/activity_chooser.xml" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/google/firebase/samples/apps/mlkit/LivePreviewActivity.java" />
       </list>
     </option>
   </component>
@@ -384,7 +384,7 @@
       <window_info anchor="bottom" id="Version Control" order="7" />
       <window_info anchor="bottom" id="Event Log" order="8" side_tool="true" weight="0.32997763" />
       <window_info anchor="bottom" id="Build" order="9" weight="0.28509718" />
-      <window_info anchor="bottom" id="Terminal" order="10" weight="0.32829374" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="10" visible="true" weight="0.32829374" />
       <window_info anchor="right" id="Device File Explorer" order="0" side_tool="true" />
       <window_info anchor="right" id="Capture Analysis" order="1" />
       <window_info anchor="right" id="Gradle" order="2" />
@@ -560,18 +560,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/google/firebase/samples/apps/mlkit/LivePreviewActivity.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="311">
-          <caret line="117" column="38" selection-start-line="117" selection-start-column="32" selection-end-line="117" selection-end-column="38" />
-          <folding>
-            <element signature="e#0#26350#0" expanded="true" />
-            <element signature="imports" expanded="true" />
-            <element signature="method#upload_video#0;class#LivePreviewActivity#0" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/google/firebase/samples/apps/mlkit/ChooserActivity.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="360">
@@ -592,6 +580,18 @@
         </state>
       </provider>
       <provider editor-type-id="android-designer2" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/google/firebase/samples/apps/mlkit/LivePreviewActivity.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="264">
+          <caret line="588" column="95" selection-start-line="588" selection-start-column="95" selection-end-line="588" selection-end-column="95" />
+          <folding>
+            <element signature="e#0#26350#0" expanded="true" />
+            <element signature="imports" expanded="true" />
+            <element signature="method#upload_video#0;class#LivePreviewActivity#0" />
+          </folding>
+        </state>
+      </provider>
     </entry>
   </component>
   <component name="masterDetails">

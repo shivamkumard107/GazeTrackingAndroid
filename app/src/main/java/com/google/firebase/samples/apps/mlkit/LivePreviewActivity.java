@@ -585,12 +585,7 @@ public final class LivePreviewActivity extends AppCompatActivity
                                 totalScore = totalScore / scoreList.size();
                             scoreList.clear();
                             progressDialog.dismiss();
-                            if (totalScore > 70) {
-                                Toast.makeText(getApplicationContext(), "You're focused", Toast.LENGTH_LONG).show();
-                            }else {
-                                Toast.makeText(getApplicationContext(), "You're not focused", Toast.LENGTH_LONG).show();
-                            }
-
+                            Toast.makeText(getApplicationContext(), "You're " + totalScore + "% focused", Toast.LENGTH_LONG).show();
                         } else
                             scoreList.add((int) (score * 100));
 
