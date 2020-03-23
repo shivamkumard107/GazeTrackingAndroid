@@ -27,10 +27,8 @@
       <change beforePath="$PROJECT_DIR$/.gradle/5.4.1/executionHistory/executionHistory.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/5.4.1/executionHistory/executionHistory.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/5.4.1/fileHashes/fileHashes.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/5.4.1/fileHashes/fileHashes.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/5.4.1/fileHashes/fileHashes.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/5.4.1/fileHashes/fileHashes.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/5.4.1/javaCompile/classAnalysis.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/5.4.1/javaCompile/classAnalysis.bin" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/5.4.1/javaCompile/javaCompile.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/5.4.1/javaCompile/javaCompile.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/google/firebase/samples/apps/mlkit/LivePreviewActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/google/firebase/samples/apps/mlkit/LivePreviewActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/drawable/eyes.png" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/drawable/eyes.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/activity_live_preview.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/activity_live_preview.xml" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -57,11 +55,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/com/google/firebase/samples/apps/mlkit/LivePreviewActivity.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="291">
-              <caret line="122" column="35" selection-start-line="122" selection-start-column="35" selection-end-line="122" selection-end-column="35" />
+            <state relative-caret-position="90">
+              <caret line="86" column="74" lean-forward="true" selection-start-line="86" selection-start-column="74" selection-end-line="86" selection-end-column="74" />
               <folding>
                 <element signature="e#0#26350#0" expanded="true" />
                 <element signature="imports" expanded="true" />
@@ -76,11 +74,16 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/activity_live_preview.xml">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="495">
-              <caret line="42" column="36" selection-start-line="42" selection-start-column="25" selection-end-line="42" selection-end-column="36" />
+            <state relative-caret-position="240">
+              <caret line="25" column="39" selection-start-line="25" selection-start-column="39" selection-end-line="25" selection-end-column="39" />
             </state>
           </provider>
           <provider editor-type-id="android-designer2" />
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/app/src/main/res/drawable/eyes.png">
+          <provider selected="true" editor-type-id="images" />
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
@@ -102,7 +105,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>fireFaceOverlay</find>
       <find>control</find>
       <find>R.id.control</find>
       <find>R.id.text</find>
@@ -132,6 +134,7 @@
       <find>inside_fire_preview</find>
       <find>preview</find>
       <find>outside_gif</find>
+      <find>GIFimg</find>
     </findStrings>
     <replaceStrings>
       <replace>inside_fire_preview</replace>
@@ -382,9 +385,6 @@
   <component name="editorHistoryManager">
     <entry file="file://$USER_HOME$/AppData/Local/Android/Sdk/sources/android-27/android/hardware/Camera.java" />
     <entry file="file://$USER_HOME$/AppData/Local/Android/Sdk/sources/android-27/android/provider/MediaStore.java" />
-    <entry file="file://$PROJECT_DIR$/app/src/main/res/drawable/eyes.png">
-      <provider selected="true" editor-type-id="images" />
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/google/firebase/samples/apps/mlkit/StillImageActivity.java" />
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/google/firebase/samples/apps/mlkit/FrameMetadata.java">
       <provider selected="true" editor-type-id="text-editor">
@@ -569,22 +569,10 @@
     <entry file="file://$USER_HOME$/Android/Sdk/platforms/android-27/data/res/drawable-hdpi/ic_dialog_info.png">
       <provider selected="true" editor-type-id="images" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/res/layout-land/activity_live_preview.xml">
-      <provider selected="true" editor-type-id="text-editor" />
-      <provider editor-type-id="android-designer2" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/activity_live_preview.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="495">
-          <caret line="42" column="36" selection-start-line="42" selection-start-column="25" selection-end-line="42" selection-end-column="36" />
-        </state>
-      </provider>
-      <provider editor-type-id="android-designer2" />
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/google/firebase/samples/apps/mlkit/LivePreviewActivity.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="291">
-          <caret line="122" column="35" selection-start-line="122" selection-start-column="35" selection-end-line="122" selection-end-column="35" />
+        <state relative-caret-position="90">
+          <caret line="86" column="74" lean-forward="true" selection-start-line="86" selection-start-column="74" selection-end-line="86" selection-end-column="74" />
           <folding>
             <element signature="e#0#26350#0" expanded="true" />
             <element signature="imports" expanded="true" />
@@ -594,6 +582,21 @@
           </folding>
         </state>
       </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/res/layout-land/activity_live_preview.xml">
+      <provider selected="true" editor-type-id="text-editor" />
+      <provider editor-type-id="android-designer2" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/activity_live_preview.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="240">
+          <caret line="25" column="39" selection-start-line="25" selection-start-column="39" selection-end-line="25" selection-end-column="39" />
+        </state>
+      </provider>
+      <provider editor-type-id="android-designer2" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/res/drawable/eyes.png">
+      <provider selected="true" editor-type-id="images" />
     </entry>
   </component>
   <component name="masterDetails">

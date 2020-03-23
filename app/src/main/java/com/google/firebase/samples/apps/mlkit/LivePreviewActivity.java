@@ -606,7 +606,6 @@ public final class LivePreviewActivity extends AppCompatActivity
                                     })
 
                                     // A null listener allows the button to dismiss the dialog and take no further action.
-                                    .setNegativeButton(android.R.string.ok, null)
                                     .setIcon(android.R.drawable.ic_dialog_info)
                                     .show();
                         } else

@@ -20,7 +20,7 @@
             android:id="@+id/imageView"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:contentDescription="allign eyes"
+            android:contentDescription="align eyes"
             android:paddingBottom="100dp"
             android:scaleType="centerInside"
             app:srcCompat="@drawable/eyes" />
