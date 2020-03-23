@@ -32,6 +32,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -72,8 +73,13 @@ public final class ChooserActivity extends AppCompatActivity
       public void onClick(View v) {
         Class<?> clicked = CLASSES[0];
         Intent i = new Intent( getApplicationContext(), clicked);
-        i.putExtra("ip", ip.getText().toString());
-        startActivity(i);
+        if(!ip.getText().toString().trim().isEmpty()) {
+          i.putExtra("ip", ip.getText().toString());
+          startActivity(i);
+        }else{
+          Toast.makeText(ChooserActivity.this, "Specify the API", Toast.LENGTH_SHORT).show();
+        }
+
       }
     });
 

@@ -65,6 +65,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.MediaType;
@@ -97,7 +98,7 @@ public final class LivePreviewActivity extends AppCompatActivity
 
     public static final int MEDIA_TYPE_IMAGE = 1;
     public static final int MEDIA_TYPE_VIDEO = 2;
-    public static final String BASE_URL = "https://shrouded-lake-86672.herokuapp.com/";
+//    public static final String BASE_URL = "https://shrouded-lake-86672.herokuapp.com/";
 
     private String fileString = "";
     private Retrofit retrofit;
@@ -114,7 +115,7 @@ public final class LivePreviewActivity extends AppCompatActivity
         Log.d(TAG, "onCreate");
 
         setContentView(R.layout.activity_live_preview);
-        Toast.makeText(this, "http://" + getIntent().getExtras().getString("ip") + ":4555", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, getIntent().getExtras().getString("ip"), Toast.LENGTH_SHORT).show();
         scoreList = new ArrayList<>();
         preview = (CameraSourcePreview) findViewById(R.id.inside_fire_preview);
         GIFimg = findViewById(R.id.outside_gif);
@@ -155,7 +156,7 @@ public final class LivePreviewActivity extends AppCompatActivity
 
         retrofit = new Retrofit.Builder()
                 .client(okHttpClient)
-                .baseUrl("http://" + getIntent().getExtras().getString("ip") + ":4555")
+                .baseUrl(Objects.requireNonNull(getIntent().getExtras().getString("ip")))
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
@@ -585,9 +586,9 @@ public final class LivePreviewActivity extends AppCompatActivity
                             scoreList.clear();
                             progressDialog.dismiss();
                             if (totalScore > 70) {
-                                Toast.makeText(getApplicationContext(), "You're " + totalScore + "% focussed", Toast.LENGTH_LONG).show();
+                                Toast.makeText(getApplicationContext(), "You're focused", Toast.LENGTH_LONG).show();
                             }else {
-                                Toast.makeText(getApplicationContext(), "You're not focussed, accuracy - " + totalScore + "%", Toast.LENGTH_LONG).show();
+                                Toast.makeText(getApplicationContext(), "You're not focused", Toast.LENGTH_LONG).show();
                             }
 
                         } else
