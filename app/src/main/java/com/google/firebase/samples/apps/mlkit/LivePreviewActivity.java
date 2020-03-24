@@ -571,7 +571,7 @@ public final class LivePreviewActivity extends AppCompatActivity
             public void onResponse(Call<JsonResponse> call, retrofit2.Response<JsonResponse> response) {
 
 //                Toast.makeText(getApplicationContext(), response + "", Toast.LENGTH_LONG).show();
-                if (response.isSuccessful()) {
+                if (response.isSuccessful()) { 
                     Log.d("LivePreview Activity : ", response + "");
 
                     Float score = response.body().getMessage();
