@@ -15,6 +15,7 @@ package com.google.firebase.samples.apps.mlkit;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
@@ -29,6 +30,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityCompat.OnRequestPermissionsResultCallback;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -37,6 +39,7 @@ import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -65,6 +68,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.MediaType;
@@ -97,7 +101,7 @@ public final class LivePreviewActivity extends AppCompatActivity
 
     public static final int MEDIA_TYPE_IMAGE = 1;
     public static final int MEDIA_TYPE_VIDEO = 2;
-    public static final String BASE_URL = "https://shrouded-lake-86672.herokuapp.com/";
+//    public static final String BASE_URL = "https://shrouded-lake-86672.herokuapp.com/";
 
     private String fileString = "";
     private Retrofit retrofit;
@@ -107,6 +111,7 @@ public final class LivePreviewActivity extends AppCompatActivity
     private long mTimeLeftInMillis = 60000;
     private CountDownTimer countDownTimer;
     private ArrayList<Integer> scoreList;
+    private ImageView dot;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,10 +119,11 @@ public final class LivePreviewActivity extends AppCompatActivity
         Log.d(TAG, "onCreate");
 
         setContentView(R.layout.activity_live_preview);
-        Toast.makeText(this, "http://" + getIntent().getExtras().getString("ip") + ":4555", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, getIntent().getExtras().getString("ip"), Toast.LENGTH_SHORT).show();
         scoreList = new ArrayList<>();
         preview = (CameraSourcePreview) findViewById(R.id.inside_fire_preview);
         GIFimg = findViewById(R.id.outside_gif);
+        dot = findViewById(R.id.dot);
         if (preview == null) {
             Log.d(TAG, "Preview is null");
         }
@@ -155,7 +161,7 @@ public final class LivePreviewActivity extends AppCompatActivity
 
         retrofit = new Retrofit.Builder()
                 .client(okHttpClient)
-                .baseUrl("http://" + getIntent().getExtras().getString("ip") + ":4555")
+                .baseUrl(Objects.requireNonNull(getIntent().getExtras().getString("ip")))
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
@@ -185,6 +191,7 @@ public final class LivePreviewActivity extends AppCompatActivity
                         timeleftTV.setVisibility(View.GONE);
                         preview.setVisibility(View.VISIBLE);
                         GIFimg.setVisibility(View.GONE);
+                        dot.setVisibility(View.GONE);
                         isRunning = false;
                     }
 
@@ -204,6 +211,7 @@ public final class LivePreviewActivity extends AppCompatActivity
                         recordTV.setText("Don't move your head and mlkit on candle");
                         preview.setVisibility(View.GONE);
                         GIFimg.setVisibility(View.VISIBLE);
+                        dot.setVisibility(View.VISIBLE);
                         isRunning = true;
                     }
 
@@ -584,12 +592,22 @@ public final class LivePreviewActivity extends AppCompatActivity
                                 totalScore = totalScore / scoreList.size();
                             scoreList.clear();
                             progressDialog.dismiss();
-                            if (totalScore > 70) {
-                                Toast.makeText(getApplicationContext(), "You're " + totalScore + "% focussed", Toast.LENGTH_LONG).show();
-                            }else {
-                                Toast.makeText(getApplicationContext(), "You're not focussed, accuracy - " + totalScore + "%", Toast.LENGTH_LONG).show();
-                            }
+                            Toast.makeText(getApplicationContext(), "You're " + totalScore + "% focused", Toast.LENGTH_LONG).show();
+                            new AlertDialog.Builder(LivePreviewActivity.this)
+                                    .setTitle("Your overall focus")
+                                    .setMessage(totalScore + "%")
 
+                                    // Specifying a listener allows you to take an action before dismissing the dialog.
+                                    // The dialog is automatically dismissed when a dialog button is clicked.
+                                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            // Continue with delete operation
+                                        }
+                                    })
+
+                                    // A null listener allows the button to dismiss the dialog and take no further action.
+                                    .setIcon(android.R.drawable.ic_dialog_info)
+                                    .show();
                         } else
                             scoreList.add((int) (score * 100));
 
