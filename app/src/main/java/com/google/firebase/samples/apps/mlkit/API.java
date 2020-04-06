@@ -20,6 +20,12 @@ public interface API {
             @Part MultipartBody.Part video
     );
 
+    @Multipart
+    @POST("lock-check")
+    Call<Response> upload_image(
+            @Part MultipartBody.Part image
+    );
+
     /*@POST("post")
     Call<Response> send_url(
             @Query("url") String url

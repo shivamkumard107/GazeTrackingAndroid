@@ -40,6 +40,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -113,6 +114,9 @@ public final class LivePreviewActivity extends AppCompatActivity
     private ArrayList<Integer> scoreList;
     private ImageView dot;
 
+    private Button recordBtn;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -151,8 +155,9 @@ public final class LivePreviewActivity extends AppCompatActivity
         ToggleButton facingSwitch = (ToggleButton) findViewById(R.id.facingswitch);
         facingSwitch.setOnCheckedChangeListener(this);
 
-        Button captureBtn = findViewById(R.id.captureBtn);
-        final Button recordBtn = findViewById(R.id.recordBtn);
+        final Button captureBtn = findViewById(R.id.captureBtn);
+
+        recordBtn = findViewById(R.id.recordBtn);
 
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
                 .readTimeout(60, TimeUnit.SECONDS)
@@ -193,6 +198,8 @@ public final class LivePreviewActivity extends AppCompatActivity
                         GIFimg.setVisibility(View.GONE);
                         dot.setVisibility(View.GONE);
                         isRunning = false;
+                        recordBtn.setVisibility(View.GONE);
+                        captureBtn.setVisibility(View.VISIBLE);
                     }
 
                     mediaRecorder.stop();  // stop the recording
@@ -207,9 +214,11 @@ public final class LivePreviewActivity extends AppCompatActivity
                     // initialize video camera
                     if (uiChange) {
 //                        timeleftTV.setVisibility(View.VISIBLE);
-                        recordBtn.setBackground(getDrawable(R.drawable.ic_pause_circle_outline_black_24dp));
-                        recordTV.setText("Don't move your head and mlkit on candle");
+                        captureBtn.setVisibility(View.GONE);
+                        recordBtn.setVisibility(View.VISIBLE);
                         preview.setVisibility(View.GONE);
+                        recordBtn.setBackground(getDrawable(R.drawable.ic_pause_circle_outline_black_24dp));
+                        recordTV.setText("Don't move your head and focus on candle");
                         GIFimg.setVisibility(View.VISIBLE);
                         dot.setVisibility(View.VISIBLE);
                         isRunning = true;
@@ -262,6 +271,7 @@ public final class LivePreviewActivity extends AppCompatActivity
             getRuntimePermissions();
         }
     }
+
 
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -410,6 +420,8 @@ public final class LivePreviewActivity extends AppCompatActivity
                 fos.write(data);
                 fos.close();
                 Log.d(TAG, "onPictureTaken: Picture saved successfully");
+                upload_image(pictureFile.toString());
+                Toast.makeText(getApplicationContext(), "Image saved successfully", Toast.LENGTH_SHORT).show();
                 startCameraSource();
             } catch (FileNotFoundException e) {
                 Log.d(TAG, "File not found: " + e.getMessage());
@@ -661,32 +673,36 @@ public final class LivePreviewActivity extends AppCompatActivity
 //        });
     }
 
-    private void upload_video() {
-
-        File file = new File(fileString);
+    private void upload_image(String imgString) {
+        final ProgressDialog dialog = new ProgressDialog(LivePreviewActivity.this);
+        dialog.setMessage("Please wait while we'are checking whether your eyes are locked or not!!!");
+        dialog.show();
+        File file = new File(imgString);
         RequestBody requestFile =
                 RequestBody.create(MediaType.parse("multipart/form-data"), file);
 
-// MultipartBody.Part is used to send also the actual file name
         MultipartBody.Part body =
-                MultipartBody.Part.createFormData("file", file.getName(), requestFile);
-        fileString = "";
+                MultipartBody.Part.createFormData("image", file.getName(), requestFile);
         API api = retrofit.create(API.class);
-        Call<Response> response = api.upload(body);
+        Call<Response> response = api.upload_image(body);
 
         response.enqueue(new Callback<Response>() {
             @Override
             public void onResponse(Call<Response> call, retrofit2.Response<Response> response) {
-                if (response.isSuccessful()) {
-                    Toast.makeText(getApplicationContext(), response + "", Toast.LENGTH_LONG).show();
-                    Log.d("LivePreview Activity : ", "SUCESS");
+                Log.d("LivePreviewActivity", "onResponse called");
+                if(response.isSuccessful()){
+                    assert response.body() != null;
+                    boolean focus = response.body().focused;
+                    if(!focus) recordBtn.callOnClick();
+                    Toast.makeText(getApplicationContext(), "Eyes are locked : "+response.body().isFocused(), Toast.LENGTH_SHORT).show();
+
                 }
-                Log.d("LivePreview Activity : ", "DONE");
+                dialog.dismiss();
             }
 
             @Override
             public void onFailure(Call<Response> call, Throwable t) {
-
+                dialog.cancel();
             }
         });
 
