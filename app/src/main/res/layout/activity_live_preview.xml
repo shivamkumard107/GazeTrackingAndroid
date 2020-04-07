@@ -10,6 +10,7 @@
     android:orientation="vertical">
 
 
+
     <com.google.firebase.samples.apps.mlkit.CameraSourcePreview
         android:id="@+id/inside_fire_preview"
         android:layout_width="match_parent"
@@ -49,15 +50,16 @@
         android:scaleType="fitXY"
         android:src="@drawable/giphy"
         android:visibility="gone"/>
+
         <ImageView
             android:id="@+id/dot"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@drawable/dot"
+            android:layout_width="30dp"
+            android:layout_height="90dp"
+            android:paddingEnd="26dp"
             android:layout_centerInParent="true"
-            android:paddingEnd="20dp"
-            android:paddingBottom="10dp"
-            android:visibility="gone"/>
+            android:paddingBottom="80dp"
+            android:src="@drawable/dot"
+            android:visibility="gone" />
 
     </RelativeLayout>
 
@@ -125,5 +127,38 @@
             android:layout_width="50dp"
             android:layout_height="60dp"
             android:visibility="gone"/>
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/start_infoTV"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone"
+        android:layout_centerInParent="true">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Video will start in"
+            android:layout_gravity="center"
+            android:textSize="36sp"
+            android:textColor="@android:color/holo_red_dark"/>
+        <TextView
+            android:id="@+id/tv_3sec"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="3"
+            android:layout_gravity="center"
+            android:textSize="36sp"
+            android:textColor="@android:color/holo_red_dark"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Kindly focus on dot"
+            android:textSize="36sp"
+            android:textColor="@android:color/holo_red_dark"/>
+
     </LinearLayout>
 </RelativeLayout>

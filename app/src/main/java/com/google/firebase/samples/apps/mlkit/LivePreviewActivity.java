@@ -40,6 +40,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -84,10 +85,6 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 import static android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE;
 
-/**
- * Demo app showing the various features of ML Kit for Firebase. This class is used to
- * set up continuous frame processing on frames from a camera source.
- */
 @KeepName
 public final class LivePreviewActivity extends AppCompatActivity
         implements OnRequestPermissionsResultCallback,
@@ -115,6 +112,7 @@ public final class LivePreviewActivity extends AppCompatActivity
     private ImageView dot;
 
     private Button recordBtn;
+    private int chunk_count;
 
 
     @Override
@@ -124,7 +122,6 @@ public final class LivePreviewActivity extends AppCompatActivity
 
         setContentView(R.layout.activity_live_preview);
         Toast.makeText(this, getIntent().getExtras().getString("ip"), Toast.LENGTH_SHORT).show();
-        scoreList = new ArrayList<>();
         preview = (CameraSourcePreview) findViewById(R.id.inside_fire_preview);
         GIFimg = findViewById(R.id.outside_gif);
         dot = findViewById(R.id.dot);
@@ -172,15 +169,57 @@ public final class LivePreviewActivity extends AppCompatActivity
 
         service = retrofit.create(API.class);
 
+        final TextView recordTV = findViewById(R.id.record_msg_tv);
+        final TextView tv3sec = findViewById(R.id.tv_3sec);
+        final LinearLayout start_inforLL = findViewById(R.id.start_infoTV);
+        final CountDownTimer threeSecTimer = new CountDownTimer(5000, 1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                int seconds = (int) millisUntilFinished / 1000;
+                tv3sec.setText(String.valueOf(seconds));
+
+            }
+
+            @Override
+            public void onFinish() {
+                Toast.makeText(getApplicationContext(), "Countdown Over", Toast.LENGTH_SHORT).show();
+                start_inforLL.setVisibility(View.GONE);
+                captureBtn.setEnabled(true);
+                recordBtn.callOnClick();
+            }
+        };
+
         captureBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                cameraSource.camera.takePicture(null, null, mPicture);
+//                cameraSource.camera.takePicture(null, null, mPicture);
+                scoreList = new ArrayList<>();
+                chunk_count=1;
+                start_inforLL.setVisibility(View.VISIBLE);
+                preview.setVisibility(View.GONE);
+                GIFimg.setVisibility(View.VISIBLE);
+                dot.setVisibility(View.VISIBLE);
+                recordTV.setText("Don't move your head and focus on candle");
+                captureBtn.setEnabled(false);
+                threeSecTimer.start();
+
             }
         });
 
-        final TextView recordTV = findViewById(R.id.record_msg_tv);
         final TextView timeleftTV = findViewById(R.id.time_left_tv);
+
+        AlertDialog alertDialog = new AlertDialog
+                .Builder(LivePreviewActivity.this)
+                .setMessage("To get accurate results, kindly please adjust your head and keep your eyes inside the overlay")
+                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                .setCancelable(true)
+                .create();
+        alertDialog.show();
 
 
         recordBtn.setOnClickListener(new View.OnClickListener() {
@@ -206,8 +245,6 @@ public final class LivePreviewActivity extends AppCompatActivity
                     releaseMediaRecorder(); // release the MediaRecorder object
                     mCamera.lock();         // take camera access back from MediaRecorder
 
-                    // inform the user that recording has stopped
-//                    recordBtn.setText("Cap");
                     isRecording = false;
 
                 } else {
@@ -216,11 +253,7 @@ public final class LivePreviewActivity extends AppCompatActivity
 //                        timeleftTV.setVisibility(View.VISIBLE);
                         captureBtn.setVisibility(View.GONE);
                         recordBtn.setVisibility(View.VISIBLE);
-                        preview.setVisibility(View.GONE);
                         recordBtn.setBackground(getDrawable(R.drawable.ic_pause_circle_outline_black_24dp));
-                        recordTV.setText("Don't move your head and focus on candle");
-                        GIFimg.setVisibility(View.VISIBLE);
-                        dot.setVisibility(View.VISIBLE);
                         isRunning = true;
                     }
 
@@ -252,6 +285,7 @@ public final class LivePreviewActivity extends AppCompatActivity
                         @Override
                         public void onFinish() {
                             Toast.makeText(getApplicationContext(), "Countdown Over", Toast.LENGTH_SHORT).show();
+                            chunk_count++;
                             uiChange = false;
                             recordBtn.callOnClick();
 
@@ -420,7 +454,7 @@ public final class LivePreviewActivity extends AppCompatActivity
                 fos.write(data);
                 fos.close();
                 Log.d(TAG, "onPictureTaken: Picture saved successfully");
-                upload_image(pictureFile.toString());
+//                upload_image(pictureFile.toString());
                 Toast.makeText(getApplicationContext(), "Image saved successfully", Toast.LENGTH_SHORT).show();
                 startCameraSource();
             } catch (FileNotFoundException e) {
@@ -562,7 +596,7 @@ public final class LivePreviewActivity extends AppCompatActivity
             public void onComplete(@NonNull Task<Uri> task) {
                 if (task.isSuccessful()) {
                     Uri downloadUri = task.getResult();
-                    Toast.makeText(getApplicationContext(), downloadUri.toString(), Toast.LENGTH_LONG).show();
+//                    Toast.makeText(getApplicationContext(), downloadUri.toString(), Toast.LENGTH_LONG).show();
                     send_url_to_server(downloadUri.toString());
                     if (uiChange) progressDialog.dismiss();
                 } else {
@@ -591,38 +625,35 @@ public final class LivePreviewActivity extends AppCompatActivity
             public void onResponse(Call<JsonResponse> call, retrofit2.Response<JsonResponse> response) {
 
 //                Toast.makeText(getApplicationContext(), response + "", Toast.LENGTH_LONG).show();
-                if (response.isSuccessful()) { 
+                if (response.isSuccessful()) {
                     Log.d("LivePreview Activity : ", response + "");
+                    assert response.body() != null;
+                    float score = response.body().getMessage();
+                    scoreList.add((int) (score * 100));
+                    Toast.makeText(getApplicationContext(), "You're " + ((int)(score*100)) + "% focused", Toast.LENGTH_LONG).show();
+                    if (!isRunning && chunk_count == scoreList.size()) {
+                        int totalScore = 0;
+                        for (int i = 0; i < scoreList.size(); i++)
+                            totalScore += scoreList.get(i);
+                        if (scoreList.size() > 0)
+                            totalScore = totalScore / scoreList.size();
+                        if (totalScore < 0) totalScore = 0;
+                        progressDialog.dismiss();
+                        new AlertDialog.Builder(LivePreviewActivity.this)
+                                .setTitle("Your overall focus")
+                                .setMessage(totalScore + "%")
 
-                    Float score = response.body().getMessage();
-                    if (score != -1) {
-                        if (!isRunning) {
-                            int totalScore = (int) (score * 100);
-                            for (int i = 0; i < scoreList.size(); i++)
-                                totalScore += scoreList.get(i);
-                            if (scoreList.size() > 0)
-                                totalScore = totalScore / scoreList.size();
-                            scoreList.clear();
-                            progressDialog.dismiss();
-                            Toast.makeText(getApplicationContext(), "You're " + totalScore + "% focused", Toast.LENGTH_LONG).show();
-                            new AlertDialog.Builder(LivePreviewActivity.this)
-                                    .setTitle("Your overall focus")
-                                    .setMessage(totalScore + "%")
+                                // Specifying a listener allows you to take an action before dismissing the dialog.
+                                // The dialog is automatically dismissed when a dialog button is clicked.
+                                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        // Continue with delete operation
+                                    }
+                                })
 
-                                    // Specifying a listener allows you to take an action before dismissing the dialog.
-                                    // The dialog is automatically dismissed when a dialog button is clicked.
-                                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            // Continue with delete operation
-                                        }
-                                    })
-
-                                    // A null listener allows the button to dismiss the dialog and take no further action.
-                                    .setIcon(android.R.drawable.ic_dialog_info)
-                                    .show();
-                        } else
-                            scoreList.add((int) (score * 100));
-
+                                // A null listener allows the button to dismiss the dialog and take no further action.
+                                .setIcon(android.R.drawable.ic_dialog_info)
+                                .show();
                     }
 
                 }
@@ -690,12 +721,11 @@ public final class LivePreviewActivity extends AppCompatActivity
             @Override
             public void onResponse(Call<Response> call, retrofit2.Response<Response> response) {
                 Log.d("LivePreviewActivity", "onResponse called");
-                if(response.isSuccessful()){
+                if (response.isSuccessful()) {
                     assert response.body() != null;
                     boolean focus = response.body().focused;
-                    if(!focus) recordBtn.callOnClick();
-                    Toast.makeText(getApplicationContext(), "Eyes are locked : "+response.body().isFocused(), Toast.LENGTH_SHORT).show();
-
+                    if (!focus) recordBtn.callOnClick();
+                    Toast.makeText(getApplicationContext(), "Eyes are locked : " + response.body().isFocused(), Toast.LENGTH_SHORT).show();
                 }
                 dialog.dismiss();
             }
