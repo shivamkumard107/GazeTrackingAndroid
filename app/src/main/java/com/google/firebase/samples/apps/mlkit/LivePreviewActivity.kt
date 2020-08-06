@@ -14,37 +14,25 @@
 package com.google.firebase.samples.apps.mlkit
 
 import android.annotation.SuppressLint
-import android.app.ProgressDialog
 import android.content.Context
 import android.content.pm.PackageManager
 import android.hardware.Camera
 import android.hardware.Camera.PictureCallback
 import android.media.CamcorderProfile
 import android.media.MediaRecorder
-import android.net.Uri
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.os.Environment
-import android.support.v4.app.ActivityCompat
-import android.support.v4.app.ActivityCompat.OnRequestPermissionsResultCallback
-import android.support.v4.content.ContextCompat
-import android.support.v7.app.AlertDialog
-import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.View
 import android.widget.*
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.app.ActivityCompat.OnRequestPermissionsResultCallback
+import androidx.core.content.ContextCompat
 import com.google.android.gms.common.annotation.KeepName
-import com.google.firebase.samples.apps.mlkit.LivePreviewActivity
-import com.google.firebase.storage.FirebaseStorage
-import okhttp3.MediaType
-import okhttp3.MultipartBody
-import okhttp3.OkHttpClient
-import okhttp3.RequestBody
 import pl.droidsonroids.gif.GifImageView
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
@@ -52,7 +40,6 @@ import java.io.IOException
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
-import java.util.concurrent.TimeUnit
 
 //import com.google.firebase.ml.common.FirebaseMLException;
 @KeepName
@@ -64,8 +51,9 @@ class LivePreviewActivity : AppCompatActivity(), OnRequestPermissionsResultCallb
 
     //    public static final String BASE_URL = "https://shrouded-lake-86672.herokuapp.com/";
     private var fileString = ""
-    private var retrofit: Retrofit? = null
-    private var service: API? = null
+
+    //    private var retrofit: Retrofit? = null
+//    private var service: API? = null
     private var uiChange = true
     private var isRunning = true
     private val mTimeLeftInMillis: Long = 60000
@@ -74,12 +62,13 @@ class LivePreviewActivity : AppCompatActivity(), OnRequestPermissionsResultCallb
     private var dot: ImageView? = null
     private var recordBtn: Button? = null
     private var chunk_count = 0
+
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d(TAG, "onCreate")
         setContentView(R.layout.activity_live_preview)
-        Toast.makeText(this, intent.extras.getString("ip"), Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, intent.extras!!.getString("ip"), Toast.LENGTH_SHORT).show()
         preview = findViewById<View>(R.id.inside_fire_preview) as CameraSourcePreview
         GIFimg = findViewById(R.id.outside_gif)
         dot = findViewById(R.id.dot)
@@ -92,33 +81,20 @@ class LivePreviewActivity : AppCompatActivity(), OnRequestPermissionsResultCallb
         }
         val spinner = findViewById<View>(R.id.spinner) as Spinner
         spinner.visibility = View.GONE
-        //    List<String> options = new ArrayList<>();
-//    options.add(FACE_DETECTION);
-//    options.add(TEXT_DETECTION);
-//    options.add(BARCODE_DETECTION);
-//    options.add(IMAGE_LABEL_DETECTION);
-//    options.add(CLASSIFICATION);
-        // Creating adapter for spinner
-//    ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(this, R.layout.spinner_style, options);
-        // Drop down layout style - list view with radio button
-//    dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        // attaching data adapter to spinner
-//    spinner.setAdapter(dataAdapter);
-//    spinner.setOnItemSelectedListener(this);
         val facingSwitch = findViewById<View>(R.id.facingswitch) as ToggleButton
         facingSwitch.setOnCheckedChangeListener(this)
         val captureBtn = findViewById<Button>(R.id.captureBtn)
         recordBtn = findViewById(R.id.recordBtn)
-        val okHttpClient = OkHttpClient.Builder()
-                .readTimeout(60, TimeUnit.SECONDS)
-                .connectTimeout(60, TimeUnit.SECONDS)
-                .build()
-        retrofit = Retrofit.Builder()
-                .client(okHttpClient)
-                .baseUrl(intent.extras.getString("ip"))
-                .addConverterFactory(GsonConverterFactory.create())
-                .build()
-        service = retrofit!!.create(API::class.java)
+//        val okHttpClient = OkHttpClient.Builder()
+//                .readTimeout(60, TimeUnit.SECONDS)
+//                .connectTimeout(60, TimeUnit.SECONDS)
+//                .build()
+//        retrofit = Retrofit.Builder()
+//                .client(okHttpClient)
+//                .baseUrl(intent.extras!!.getString("ip"))
+//                .addConverterFactory(GsonConverterFactory.create())
+//                .build()
+//        service = retrofit!!.create(API::class.java)
         val recordTV = findViewById<TextView>(R.id.record_msg_tv)
         val tv3sec = findViewById<TextView>(R.id.tv_3sec)
         val start_inforLL = findViewById<LinearLayout>(R.id.start_infoTV)
@@ -409,161 +385,128 @@ class LivePreviewActivity : AppCompatActivity(), OnRequestPermissionsResultCallb
             mediaRecorder!!.release() // release the recorder object
             mediaRecorder = null
             mCamera!!.lock() // lock camera for later use
-            if (fileString != "") {
-                upload_to_firebase()
-                Toast.makeText(applicationContext, "Uploading Video to server ...", Toast.LENGTH_LONG).show()
-            }
+//            if (fileString != "") {
+//                upload_to_firebase()
+//                Toast.makeText(applicationContext, "Uploading Video to server ...", Toast.LENGTH_LONG).show()
+//            }
         }
     }
 
-    private fun upload_to_firebase() {
-        val progressDialog = ProgressDialog(this@LivePreviewActivity)
-        if (uiChange) {
-            progressDialog.setMessage("Uploading to server...")
-            progressDialog.setCanceledOnTouchOutside(false)
-            progressDialog.setCancelable(false)
-            progressDialog.show()
-        } else {
-            Toast.makeText(applicationContext, "Sending chunk data...", Toast.LENGTH_SHORT).show()
-        }
-        val mStorageRef = FirebaseStorage.getInstance().reference
-        val videoFile = File(fileString)
-        val file = Uri.fromFile(videoFile)
-        fileString = ""
-        val ref = mStorageRef.child("images").child(videoFile.name)
-        val uploadTask = ref.putFile(file)
-        val urlTask = uploadTask.continueWithTask { task ->
-            if (!task.isSuccessful) {
-                throw task.exception!!
-            }
-
-            // Continue with the task to get the download URL
-            ref.downloadUrl
-        }.addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                val downloadUri = task.result
-                //                    Toast.makeText(getApplicationContext(), downloadUri.toString(), Toast.LENGTH_LONG).show();
-                send_url_to_server(downloadUri.toString())
-                if (uiChange) progressDialog.dismiss()
-            } else {
-                // Handle failures
-                // ...
-            }
-        }
-    }
-
-    private fun send_url_to_server(url: String) {
-        val progressDialog = ProgressDialog(this@LivePreviewActivity)
-        if (!isRunning) {
-            progressDialog.setMessage("Please wait while we are calculating results...")
-            progressDialog.setCancelable(false)
-            progressDialog.setCanceledOnTouchOutside(false)
-            progressDialog.show()
-        }
-        val api = retrofit!!.create(API::class.java)
-        //        Call<Response> response = api.send_url(url);
-        val param = Param(url)
-        val response = api.send_url(param)
-        response.enqueue(object : Callback<JsonResponse?> {
-            override fun onResponse(call: Call<JsonResponse?>, response: retrofit2.Response<JsonResponse?>) {
-
-//                Toast.makeText(getApplicationContext(), response + "", Toast.LENGTH_LONG).show();
-                if (response.isSuccessful) {
-                    Log.d("LivePreview Activity : ", response.toString() + "")
-                    assert(response.body() != null)
-                    val score = response.body()!!.message
-                    scoreList!!.add((score * 100).toInt())
-                    Toast.makeText(applicationContext, "You're " + (score * 100).toInt() + "% focused", Toast.LENGTH_LONG).show()
-                    if (!isRunning && chunk_count == scoreList!!.size) {
-                        var totalScore = 0
-                        for (i in scoreList!!.indices) totalScore += scoreList!![i]
-                        if (scoreList!!.size > 0) totalScore = totalScore / scoreList!!.size
-                        if (totalScore < 0) totalScore = 0
-                        progressDialog.dismiss()
-                        AlertDialog.Builder(this@LivePreviewActivity)
-                                .setTitle("Your overall focus")
-                                .setMessage("$totalScore%") // Specifying a listener allows you to take an action before dismissing the dialog.
-                                // The dialog is automatically dismissed when a dialog button is clicked.
-                                .setPositiveButton(android.R.string.yes) { dialog, which ->
-                                    // Continue with delete operation
-                                } // A null listener allows the button to dismiss the dialog and take no further action.
-                                .setIcon(android.R.drawable.ic_dialog_info)
-                                .show()
-                    }
-                }
-                Log.d("LivePreview Activity : ", "SUCESS")
-                if (progressDialog.isShowing) progressDialog.dismiss()
-            }
-
-            override fun onFailure(call: Call<JsonResponse?>, t: Throwable) {
-                if (progressDialog.isShowing) progressDialog.dismiss()
-                Toast.makeText(applicationContext, t.message + "", Toast.LENGTH_LONG).show()
-            }
-        })
-        //        response.enqueue(new Callback<Response>() {
-//            @Override
-//            public void onResponse(Call<Response> call, retrofit2.Response<Response> response) {
-//                if (response.isSuccessful()) {
-//                    Log.d("LivePreview Activity : ", response+"");
-//                    Integer score = response.body().getScore();
-//                    if (score != -1){
-//                        if(!isRunning){
-//                            int totalScore = score;
-//                            for (int i=0; i<scoreList.size(); i++)
-//                                totalScore += scoreList.get(i);
-//                            totalScore = totalScore/scoreList.size();
-//                            scoreList.clear();
-//                            progressDialog.dismiss();
-//                            if (totalScore > 70){
-//                                Toast.makeText(getApplicationContext(), "You're " + totalScore + "% focussed", Toast.LENGTH_LONG).show();
-//                            }
+//    private fun upload_to_firebase() {
+//        val progressDialog = ProgressDialog(this@LivePreviewActivity)
+//        if (uiChange) {
+//            progressDialog.setMessage("Uploading to server...")
+//            progressDialog.setCanceledOnTouchOutside(false)
+//            progressDialog.setCancelable(false)
+//            progressDialog.show()
+//        } else {
+//            Toast.makeText(applicationContext, "Sending chunk data...", Toast.LENGTH_SHORT).show()
+//        }
+//        val mStorageRef = FirebaseStorage.getInstance().reference
+//        val videoFile = File(fileString)
+//        val file = Uri.fromFile(videoFile)
+//        fileString = ""
+//        val ref = mStorageRef.child("images").child(videoFile.name)
+//        val uploadTask = ref.putFile(file)
+//        val urlTask = uploadTask.continueWithTask { task ->
+//            if (!task.isSuccessful) {
+//                throw task.exception!!
+//            }
 //
-//                        }else
-//                            scoreList.add(score);
+//            // Continue with the task to get the download URL
+//            ref.downloadUrl
+//        }.addOnCompleteListener { task ->
+//            if (task.isSuccessful) {
+//                val downloadUri = task.result
+//                //                    Toast.makeText(getApplicationContext(), downloadUri.toString(), Toast.LENGTH_LONG).show();
+////                send_url_to_server(downloadUri.toString())
+//                if (uiChange) progressDialog.dismiss()
+//            } else {
+//                // Handle failures
+//                // ...
+//            }
+//        }
+//    }
+
+//    private fun send_url_to_server(url: String) {
+//        val progressDialog = ProgressDialog(this@LivePreviewActivity)
+//        if (!isRunning) {
+//            progressDialog.setMessage("Please wait while we are calculating results...")
+//            progressDialog.setCancelable(false)
+//            progressDialog.setCanceledOnTouchOutside(false)
+//            progressDialog.show()
+//        }
+//        val api = retrofit!!.create(API::class.java)
+//        //        Call<Response> response = api.send_url(url);
+//        val param = Param(url)
+//        val response = api.send_url(param)
+//        response.enqueue(object : Callback<JsonResponse?> {
+//            override fun onResponse(call: Call<JsonResponse?>, response: retrofit2.Response<JsonResponse?>) {
 //
+////                Toast.makeText(getApplicationContext(), response + "", Toast.LENGTH_LONG).show();
+//                if (response.isSuccessful) {
+//                    Log.d("LivePreview Activity : ", response.toString() + "")
+//                    assert(response.body() != null)
+//                    val score = response.body()!!.message
+//                    scoreList!!.add((score * 100).toInt())
+//                    Toast.makeText(applicationContext, "You're " + (score * 100).toInt() + "% focused", Toast.LENGTH_LONG).show()
+//                    if (!isRunning && chunk_count == scoreList!!.size) {
+//                        var totalScore = 0
+//                        for (i in scoreList!!.indices) totalScore += scoreList!![i]
+//                        if (scoreList!!.size > 0) totalScore = totalScore / scoreList!!.size
+//                        if (totalScore < 0) totalScore = 0
+//                        progressDialog.dismiss()
+//                        AlertDialog.Builder(this@LivePreviewActivity)
+//                                .setTitle("Your overall focus")
+//                                .setMessage("$totalScore%") // Specifying a listener allows you to take an action before dismissing the dialog.
+//                                // The dialog is automatically dismissed when a dialog button is clicked.
+//                                .setPositiveButton(android.R.string.yes) { dialog, which ->
+//                                    // Continue with delete operation
+//                                } // A null listener allows the button to dismiss the dialog and take no further action.
+//                                .setIcon(android.R.drawable.ic_dialog_info)
+//                                .show()
 //                    }
-//
 //                }
-//                Log.d("LivePreview Activity : ", "SUCESS");
-//                if(progressDialog.isShowing()) progressDialog.dismiss();
+//                Log.d("LivePreview Activity : ", "SUCESS")
+//                if (progressDialog.isShowing) progressDialog.dismiss()
 //            }
 //
-//            @Override
-//            public void onFailure(Call<Response> call, Throwable t) {
-//                progressDialog.cancel();
-//                Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_LONG).show();
+//            override fun onFailure(call: Call<JsonResponse?>, t: Throwable) {
+//                if (progressDialog.isShowing) progressDialog.dismiss()
+//                Toast.makeText(applicationContext, t.message + "", Toast.LENGTH_LONG).show()
 //            }
-//        });
-    }
+//        })
 
-    private fun upload_image(imgString: String) {
-        val dialog = ProgressDialog(this@LivePreviewActivity)
-        dialog.setMessage("Please wait while we'are checking whether your eyes are locked or not!!!")
-        dialog.show()
-        val file = File(imgString)
-        val requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file)
-        val body = MultipartBody.Part.createFormData("image", file.name, requestFile)
-        val api = retrofit!!.create(API::class.java)
-        val response = api.upload_image(body)
-        response.enqueue(object : Callback<Response?> {
-            override fun onResponse(call: Call<Response?>, response: retrofit2.Response<Response?>) {
-                Log.d("LivePreviewActivity", "onResponse called")
-                if (response.isSuccessful) {
-                    if (BuildConfig.DEBUG && response.body() == null) {
-                        error("Assertion failed")
-                    }
-                    val focus = response.body()!!.focused
-                    if (!focus) recordBtn!!.callOnClick()
-                    Toast.makeText(applicationContext, "Eyes are locked : " + response.body()!!.isFocused, Toast.LENGTH_SHORT).show()
-                }
-                dialog.dismiss()
-            }
+//    }
 
-            override fun onFailure(call: Call<Response?>, t: Throwable) {
-                dialog.cancel()
-            }
-        })
-    }
+//    private fun upload_image(imgString: String) {
+//        val dialog = ProgressDialog(this@LivePreviewActivity)
+//        dialog.setMessage("Please wait while we'are checking whether your eyes are locked or not!!!")
+//        dialog.show()
+//        val file = File(imgString)
+//        val requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file)
+//        val body = MultipartBody.Part.createFormData("image", file.name, requestFile)
+//        val api = retrofit!!.create(API::class.java)
+//        val response = api.upload_image(body)
+//        response.enqueue(object : Callback<Response?> {
+//            override fun onResponse(call: Call<Response?>, response: retrofit2.Response<Response?>) {
+//                Log.d("LivePreviewActivity", "onResponse called")
+//                if (response.isSuccessful) {
+//                    if (BuildConfig.DEBUG && response.body() == null) {
+//                        error("Assertion failed")
+//                    }
+//                    val focus = response.body()!!.focused
+//                    if (!focus) recordBtn!!.callOnClick()
+//                    Toast.makeText(applicationContext, "Eyes are locked : " + response.body()!!.isFocused, Toast.LENGTH_SHORT).show()
+//                }
+//                dialog.dismiss()
+//            }
+//
+//            override fun onFailure(call: Call<Response?>, t: Throwable) {
+//                dialog.cancel()
+//            }
+//        })
+//    }
 
     companion object {
         private const val TAG = "LivePreviewActivity"
