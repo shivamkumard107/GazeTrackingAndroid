@@ -46,7 +46,7 @@ class LivePreviewActivity : AppCompatActivity(), OnRequestPermissionsResultCallb
     private var scoreList: ArrayList<Int>? = null
     private var dot: ImageView? = null
     private var recordBtn: Button? = null
-    private var chunkCount = 0
+//    private var chunkCount = 0
 
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -75,7 +75,7 @@ class LivePreviewActivity : AppCompatActivity(), OnRequestPermissionsResultCallb
             }
 
             override fun onFinish() {
-                Toast.makeText(applicationContext, "Countdown Over", Toast.LENGTH_SHORT).show()
+                Toast.makeText(applicationContext, "Recording Started...", Toast.LENGTH_SHORT).show()
                 startInForLL.visibility = View.GONE
                 captureBtn.isEnabled = true
                 recordBtn!!.callOnClick()
@@ -84,7 +84,7 @@ class LivePreviewActivity : AppCompatActivity(), OnRequestPermissionsResultCallb
 
         captureBtn.setOnClickListener {
             scoreList = ArrayList()
-            chunkCount = 1
+//            chunkCount = 1
             startInForLL.visibility = View.VISIBLE
             preview!!.visibility = View.GONE
             GIFimg!!.visibility = View.VISIBLE
@@ -95,11 +95,13 @@ class LivePreviewActivity : AppCompatActivity(), OnRequestPermissionsResultCallb
             ivTimer.visibility = View.GONE
         }
         val alertDialog = AlertDialog.Builder(this@LivePreviewActivity)
-                .setMessage("To get accurate results, kindly please adjust your head and keep your eyes inside the overlay")
+                .setMessage("To get accurate results, kindly please adjust your head and keep your eyes still")
                 .setPositiveButton("Ok") { dialog, _ ->
                     run {
                         dialog.dismiss()
-                        setCountDown()
+//                        setCountDown()
+                        getTimePickerDialog()
+
                     }
                 }
                 .setCancelable(true)
@@ -109,6 +111,7 @@ class LivePreviewActivity : AppCompatActivity(), OnRequestPermissionsResultCallb
             if (isRecording) {
                 // stop recording and release camera
                 stopTimer()
+                Toast.makeText(this@LivePreviewActivity, "Video Saved at CandleFocus Folder in Pictures", Toast.LENGTH_LONG).show()
                 if (countDownTimer != null) countDownTimer!!.cancel()
                 if (uiChange) {
                     recordBtn!!.background = getDrawable(R.drawable.circle)
@@ -145,23 +148,23 @@ class LivePreviewActivity : AppCompatActivity(), OnRequestPermissionsResultCallb
                     releaseMediaRecorder()
                     // inform user
                 }
-                countDownTimer = object : CountDownTimer(mTimeLeftInMillis, 1000) {
-                    override fun onTick(millisUntilFinished: Long) {
-                        val mins = millisUntilFinished.toInt() / (60 * 1000)
-                        val seconds = (millisUntilFinished / 1000) - mins * 60
-                        val format = DecimalFormat("00")
-                    }
-
-                    override fun onFinish() {
-                        Toast.makeText(applicationContext, "Countdown Over", Toast.LENGTH_SHORT).show()
-                        chunkCount++
-                        uiChange = false
-                        recordBtn!!.callOnClick()
-                        recordBtn!!.callOnClick()
-                        uiChange = true
-                    }
-                }
-                countDownTimer!!.start()
+//                countDownTimer = object : CountDownTimer(mTimeLeftInMillis, 1000) {
+//                    override fun onTick(millisUntilFinished: Long) {
+//                        val mins = millisUntilFinished.toInt() / (60 * 1000)
+//                        val seconds = (millisUntilFinished / 1000) - mins * 60
+//                        val format = DecimalFormat("00")
+//                    }
+//
+//                    override fun onFinish() {
+//                        Toast.makeText(applicationContext, "Countdown Over", Toast.LENGTH_SHORT).show()
+//                        chunkCount++
+//                        uiChange = false
+//                        recordBtn!!.callOnClick()
+//                        recordBtn!!.callOnClick()
+//                        uiChange = true
+//                    }
+//                }
+//                countDownTimer!!.start()
             }
         })
 
@@ -174,23 +177,6 @@ class LivePreviewActivity : AppCompatActivity(), OnRequestPermissionsResultCallb
             runtimePermissions
         }
     }
-
-    private fun setCountDown() {
-        AlertDialog.Builder(this)
-                .setMessage("To get accurate results, kindly try not to move your head.")
-                .setPositiveButton("Okay") { _, _ ->
-                    getTimePickerDialog()
-                    Toast.makeText(
-                            this@LivePreviewActivity,
-                            "Select time to meditate",
-                            Toast.LENGTH_LONG
-                    )
-                            .show()
-                }.setCancelable(false)
-                .create().show()
-
-    }
-
 
     private var mHour = 0
     private var mMinute = 0
@@ -462,14 +448,14 @@ class LivePreviewActivity : AppCompatActivity(), OnRequestPermissionsResultCallb
             // To be safe, you should check that the SDCard is mounted
             // using Environment.getExternalStorageState() before doing this.
             val mediaStorageDir = File(Environment.getExternalStoragePublicDirectory(
-                    Environment.DIRECTORY_PICTURES), "MyCameraApp")
+                    Environment.DIRECTORY_PICTURES), "CandleFocus")
             // This location works best if you want the created images to be shared
             // between applications and persist after your app has been uninstalled.
 
             // Create the storage directory if it does not exist
             if (!mediaStorageDir.exists()) {
                 if (!mediaStorageDir.mkdirs()) {
-                    Log.d("MyCameraApp", "failed to create directory")
+                    Log.d("CandleFocus", "failed to create directory")
                     return null
                 }
             }
