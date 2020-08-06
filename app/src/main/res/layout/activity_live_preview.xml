@@ -14,7 +14,7 @@
         android:id="@+id/inside_fire_preview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/rl_outside_gif">
+        android:layout_below="@id/rl_outside_gif">.
 
 
         <com.google.firebase.samples.apps.mlkit.GraphicOverlay

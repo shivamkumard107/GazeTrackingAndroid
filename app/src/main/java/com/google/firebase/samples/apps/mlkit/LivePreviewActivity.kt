@@ -95,7 +95,7 @@ class LivePreviewActivity : AppCompatActivity(), OnRequestPermissionsResultCallb
             ivTimer.visibility = View.GONE
         }
         val alertDialog = AlertDialog.Builder(this@LivePreviewActivity)
-                .setMessage("To get accurate results, kindly please adjust your head and keep your eyes still")
+                .setMessage("To get accurate results, \n1. kindly please adjust your camera and head \n2.keep your eyes still \n3.Make sure your eye are visible in camera preview (well lit room)\uD83D\uDCA1")
                 .setPositiveButton("Ok") { dialog, _ ->
                     run {
                         dialog.dismiss()
@@ -353,7 +353,6 @@ class LivePreviewActivity : AppCompatActivity(), OnRequestPermissionsResultCallb
             fos.write(data)
             fos.close()
             Log.d(TAG, "onPictureTaken: Picture saved successfully")
-            //                upload_image(pictureFile.toString());
             Toast.makeText(applicationContext, "Image saved successfully", Toast.LENGTH_SHORT).show()
             startCameraSource()
         } catch (e: FileNotFoundException) {

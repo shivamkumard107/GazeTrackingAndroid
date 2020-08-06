@@ -11,7 +11,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
 package com.google.firebase.samples.apps.mlkit;
 
 import android.Manifest;
@@ -287,6 +286,11 @@ public class CameraSource {
     }
 
     Camera.Parameters parameters = camera.getParameters();
+    parameters.setExposureCompensation(parameters.getMaxExposureCompensation());
+
+    if (parameters.getAutoExposureLock()){
+      parameters.setAutoExposureLock(false);
+    }
 
     if (pictureSize != null) {
       parameters.setPictureSize(pictureSize.getWidth(), pictureSize.getHeight());
