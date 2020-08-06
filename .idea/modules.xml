@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/android-firebase-mlkit.iml" filepath="$PROJECT_DIR$/android-firebase-mlkit.iml" group="android-firebase-mlkit" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" group="android-firebase-mlkit/app" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/GazeTrackingAndroid.iml" filepath="$PROJECT_DIR$/.idea/modules/GazeTrackingAndroid.iml" group="GazeTrackingAndroid" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" group="GazeTrackingAndroid/app" />
     </modules>
   </component>
 </project>
