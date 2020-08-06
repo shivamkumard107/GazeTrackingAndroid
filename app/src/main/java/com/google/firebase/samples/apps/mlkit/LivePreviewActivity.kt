@@ -1,28 +1,16 @@
-// Copyright 2018 Google LLC
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
 package com.google.firebase.samples.apps.mlkit
 
 import android.annotation.SuppressLint
+import android.app.TimePickerDialog
 import android.content.Context
 import android.content.pm.PackageManager
 import android.hardware.Camera
 import android.hardware.Camera.PictureCallback
+import android.media.AudioManager
 import android.media.CamcorderProfile
 import android.media.MediaRecorder
-import android.os.Bundle
-import android.os.CountDownTimer
-import android.os.Environment
+import android.media.ToneGenerator
+import android.os.*
 import android.util.Log
 import android.view.View
 import android.widget.*
@@ -32,6 +20,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityCompat.OnRequestPermissionsResultCallback
 import androidx.core.content.ContextCompat
 import com.google.android.gms.common.annotation.KeepName
+import kotlinx.android.synthetic.main.activity_live_preview.*
 import pl.droidsonroids.gif.GifImageView
 import java.io.File
 import java.io.FileNotFoundException
@@ -42,7 +31,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 @KeepName
-class LivePreviewActivity : AppCompatActivity(), OnRequestPermissionsResultCallback, CompoundButton.OnCheckedChangeListener {
+class LivePreviewActivity : AppCompatActivity(), OnRequestPermissionsResultCallback {
     private var cameraSource: CameraSource? = null
     private var preview: CameraSourcePreview? = null
     private var graphicOverlay: GraphicOverlay? = null
@@ -64,7 +53,6 @@ class LivePreviewActivity : AppCompatActivity(), OnRequestPermissionsResultCallb
         super.onCreate(savedInstanceState)
         Log.d(TAG, "onCreate")
         setContentView(R.layout.activity_live_preview)
-        Toast.makeText(this, intent.extras!!.getString("ip"), Toast.LENGTH_SHORT).show()
         preview = findViewById<View>(R.id.inside_fire_preview) as CameraSourcePreview
         GIFimg = findViewById(R.id.outside_gif)
         dot = findViewById(R.id.dot)
@@ -75,10 +63,6 @@ class LivePreviewActivity : AppCompatActivity(), OnRequestPermissionsResultCallb
         if (graphicOverlay == null) {
             Log.d(TAG, "graphicOverlay is null")
         }
-        val spinner = findViewById<View>(R.id.spinner) as Spinner
-        spinner.visibility = View.GONE
-        val facingSwitch = findViewById<View>(R.id.facingswitch) as ToggleButton
-        facingSwitch.setOnCheckedChangeListener(this)
         val captureBtn = findViewById<Button>(R.id.captureBtn)
         recordBtn = findViewById(R.id.recordBtn)
         val recordTV = findViewById<TextView>(R.id.record_msg_tv)
@@ -97,6 +81,7 @@ class LivePreviewActivity : AppCompatActivity(), OnRequestPermissionsResultCallb
                 recordBtn!!.callOnClick()
             }
         }
+
         captureBtn.setOnClickListener {
             scoreList = ArrayList()
             chunkCount = 1
@@ -107,22 +92,27 @@ class LivePreviewActivity : AppCompatActivity(), OnRequestPermissionsResultCallb
             recordTV.text = "Don't move your head and focus on candle"
             captureBtn.isEnabled = false
             threeSecTimer.start()
+            ivTimer.visibility = View.GONE
         }
-        val timeleftTV = findViewById<TextView>(R.id.time_left_tv)
         val alertDialog = AlertDialog.Builder(this@LivePreviewActivity)
                 .setMessage("To get accurate results, kindly please adjust your head and keep your eyes inside the overlay")
-                .setPositiveButton("Ok") { dialog, which -> dialog.dismiss() }
+                .setPositiveButton("Ok") { dialog, _ ->
+                    run {
+                        dialog.dismiss()
+                        setCountDown()
+                    }
+                }
                 .setCancelable(true)
                 .create()
         alertDialog.show()
         recordBtn!!.setOnClickListener(View.OnClickListener {
             if (isRecording) {
                 // stop recording and release camera
+                stopTimer()
                 if (countDownTimer != null) countDownTimer!!.cancel()
                 if (uiChange) {
                     recordBtn!!.background = getDrawable(R.drawable.circle)
                     recordTV.text = "Please adjust your eyes and tap to start"
-                    timeleftTV.visibility = View.GONE
                     preview!!.visibility = View.VISIBLE
                     GIFimg!!.visibility = View.GONE
                     dot!!.visibility = View.GONE
@@ -137,20 +127,19 @@ class LivePreviewActivity : AppCompatActivity(), OnRequestPermissionsResultCallb
             } else {
                 // initialize video camera
                 if (uiChange) {
-//                        timeleftTV.setVisibility(View.VISIBLE);
                     captureBtn.visibility = View.GONE
                     recordBtn!!.visibility = View.VISIBLE
                     recordBtn!!.background = getDrawable(R.drawable.ic_pause_circle_outline_black_24dp)
                     isRunning = true
                 }
                 if (prepareVideoRecorder()) {
+                    countDown(mHour, mMinute)
                     // Camera is available and unlocked, MediaRecorder is prepared,
                     // now you can start recording
                     mediaRecorder!!.start()
-
                     // inform the user that recording has started
-//                        recordBtn.setText("Stop");
                     isRecording = true
+                    setTimer()
                 } else {
                     // prepare didn't work, release the camera
                     releaseMediaRecorder()
@@ -161,8 +150,6 @@ class LivePreviewActivity : AppCompatActivity(), OnRequestPermissionsResultCallb
                         val mins = millisUntilFinished.toInt() / (60 * 1000)
                         val seconds = (millisUntilFinished / 1000) - mins * 60
                         val format = DecimalFormat("00")
-                        val timeleftStr = format.format(mins.toLong()) + ":" + format.format(seconds.toLong())
-                        timeleftTV.text = timeleftStr
                     }
 
                     override fun onFinish() {
@@ -177,6 +164,10 @@ class LivePreviewActivity : AppCompatActivity(), OnRequestPermissionsResultCallb
                 countDownTimer!!.start()
             }
         })
+
+        ivTimer.setOnClickListener { getTimePickerDialog() }
+
+
         if (allPermissionsGranted()) {
             createCameraSource()
         } else {
@@ -184,18 +175,86 @@ class LivePreviewActivity : AppCompatActivity(), OnRequestPermissionsResultCallb
         }
     }
 
-    override fun onCheckedChanged(buttonView: CompoundButton, isChecked: Boolean) {
-        Log.d(TAG, "Set facing")
-        if (cameraSource != null) {
-            if (!isChecked) {
-                cameraSource!!.setFacing(CameraSource.CAMERA_FACING_FRONT)
-            } else {
-                cameraSource!!.setFacing(CameraSource.CAMERA_FACING_BACK)
-            }
-        }
-        preview!!.stop()
-        startCameraSource()
+    private fun setCountDown() {
+        AlertDialog.Builder(this)
+                .setMessage("To get accurate results, kindly try not to move your head.")
+                .setPositiveButton("Okay") { _, _ ->
+                    getTimePickerDialog()
+                    Toast.makeText(
+                            this@LivePreviewActivity,
+                            "Select time to meditate",
+                            Toast.LENGTH_LONG
+                    )
+                            .show()
+                }.setCancelable(false)
+                .create().show()
+
     }
+
+
+    private var mHour = 0
+    private var mMinute = 0
+
+    @SuppressLint("DefaultLocale")
+    private fun getTimePickerDialog() {
+        val hour = 0 //0 hours
+        val minute = 0 // 3 minutes
+        val mTimePicker: TimePickerDialog
+        mTimePicker = TimePickerDialog(
+                this,
+                TimePickerDialog.OnTimeSetListener { _, selectedHour, selectedMinute ->
+                    mHour = selectedHour
+                    mMinute = selectedMinute
+                    Toast.makeText(
+                            this,
+                            "Timer set for $selectedHour hour and $selectedMinute minutes",
+                            Toast.LENGTH_LONG
+                    ).show()
+                }, hour, minute, true
+        )
+        mTimePicker.setTitle("Select time to meditate")
+        mTimePicker.show()
+
+    }
+
+    private fun countDown(selectedHour: Int, selectedMinute: Int) {
+        Log.d("time_info", "$selectedHour $selectedMinute")
+        object : CountDownTimer(((selectedHour * 60 + selectedMinute) * 60000).toLong(), 1000) {
+            @SuppressLint("SetTextI18n")
+            override fun onTick(millisUntilFinished: Long) {
+            }
+
+            override fun onFinish() {
+                if (isRecording) {
+                    vibrateAndBeepPhone()
+                    Toast.makeText(
+                            this@LivePreviewActivity,
+                            "Meditation time complete. You may stop recording",
+                            Toast.LENGTH_LONG
+                    )
+                            .show()
+                }
+            }
+        }.start()
+    }
+
+
+    private fun vibrateAndBeepPhone() {
+        val toneGen1 = ToneGenerator(AudioManager.STREAM_MUSIC, 150)
+        toneGen1.startTone(ToneGenerator.TONE_CDMA_PIP, 200)
+        val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+        if (Build.VERSION.SDK_INT >= 26) {
+            vibrator.vibrate(
+                    VibrationEffect.createOneShot(
+                            200,
+                            VibrationEffect.DEFAULT_AMPLITUDE
+                    )
+            )
+        } else {
+            vibrator.vibrate(200)
+        }
+    }
+
 
     private fun createCameraSource() {
         // If there's no existing cameraSource, create one.
@@ -255,7 +314,7 @@ class LivePreviewActivity : AppCompatActivity(), OnRequestPermissionsResultCallb
             val info = this.packageManager
                     .getPackageInfo(this.packageName, PackageManager.GET_PERMISSIONS)
             val ps = info.requestedPermissions
-            if (ps != null && ps.size > 0) {
+            if (ps != null && ps.isNotEmpty()) {
                 ps
             } else {
                 arrayOfNulls(0)
@@ -339,7 +398,6 @@ class LivePreviewActivity : AppCompatActivity(), OnRequestPermissionsResultCallb
         //    mediaRecorder.setOrientationHint(90);
 
         // Step 3: Set a CamcorderProfile (requires API Level 8 or higher)
-//    mediaRecorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_LOW));
         mediaRecorder!!.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_480P))
 
 
@@ -372,6 +430,17 @@ class LivePreviewActivity : AppCompatActivity(), OnRequestPermissionsResultCallb
             mediaRecorder = null
             mCamera!!.lock() // lock camera for later use
         }
+    }
+
+    private fun setTimer() {
+        ivTimer.visibility = View.GONE
+        tvTimer.base = SystemClock.elapsedRealtime()
+        tvTimer.start()
+    }
+
+    private fun stopTimer() {
+        ivTimer.visibility = View.VISIBLE
+        tvTimer.stop()
     }
 
     companion object {

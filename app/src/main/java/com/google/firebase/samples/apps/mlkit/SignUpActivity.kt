@@ -50,7 +50,7 @@ class SignUpActivity : AppCompatActivity() {
                 val authResult = mAuth.createUserWithEmailAndPassword(emailStr, passStr).await()
                 if (authResult.user != null) {
                     withContext(Dispatchers.Main) {
-                        Intent(this@SignUpActivity, ChooserActivity::class.java).also {
+                        Intent(this@SignUpActivity, LivePreviewActivity::class.java).also {
                             it.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                             startActivity(it)
                         }

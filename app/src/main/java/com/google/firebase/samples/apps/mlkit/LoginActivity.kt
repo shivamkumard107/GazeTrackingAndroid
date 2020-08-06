@@ -28,7 +28,7 @@ class LoginActivity : AppCompatActivity() {
         super.onStart()
         mAuth = FirebaseAuth.getInstance()
         mAuth.currentUser?.also {
-            Intent(this, ChooserActivity::class.java).also {
+            Intent(this, LivePreviewActivity::class.java).also {
                 startActivity(it)
                 finish()
             }
